@@ -2038,7 +2038,7 @@ Built for students, businesses and everyday PDF needs.
    GLOBAL
 ========================================================= */
 
-const API_URL = "http://127.0.0.1:3000";
+const API_URL = "https://pdf-maker-66o3.onrender.com";
 
 let selectedFiles = [];
 let lastPDFBlob = null;
@@ -6504,12 +6504,12 @@ document.addEventListener("DOMContentLoaded", function(){
 });
 </script>
 
-<style>#legalPolicyBtn{position:fixed;right:0;bottom:0;z-index:9998;background:transparent;color:#777;border:0;padding:4px 6px;font-size:9px;font-weight:500;cursor:pointer;text-decoration:none}</style><a id="legalPolicyBtn" href="http://127.0.0.1:3000/terms-policy" target="_blank">Terms &amp; Policy</a>
+<style>#legalPolicyBtn{position:fixed;right:0;bottom:0;z-index:9998;background:transparent;color:#777;border:0;padding:4px 6px;font-size:9px;font-weight:500;cursor:pointer;text-decoration:none}</style><a id="legalPolicyBtn" href="https://pdf-maker-66o3.onrender.com/terms-policy" target="_blank">Terms &amp; Policy</a>
 <script>
 (function(){
   if(sessionStorage.getItem("pdfMakerVisitTracked")) return;
 
-  fetch("http://127.0.0.1:3000/api/visit")
+  fetch("https://pdf-maker-66o3.onrender.com/api/visit")
     .then(function(response){
       if(response.ok){
         sessionStorage.setItem("pdfMakerVisitTracked","1");

@@ -1,0 +1,43 @@
+.env
+.env.*
+!.env.example
+
+node_modules/
+uploads/
+temp/
+
+*.log
+
+server-before-*.js
+admin-before-*.html
+*.backup
+
+# Old frontend backups and test files
+frontend/index-before-*.html
+frontend/index-backup.html
+frontend/index-broken.html
+frontend/check.js
+frontend/check-text.js
+frontend/*-fix.js
+frontend/*.txt
+frontend/*.sh
+frontend/frontend-test.js
+
+# Backend old backups and test files
+backend/server-before-*.html
+backend/server-before-*.js
+backend/fix-payment.js
+backend/test-output.pdf
+backend/*.log
+
+# Environment backups
+.env-*
+backend/.env-*
+backend/.env.backup
+
+# Additional old frontend scripts
+frontend/replace-structured-text.js
+frontend/smooth-crop-block.js
+frontend/smooth-crop.js
+frontend/text-editor-fixed.js
+frontend/text-pdf-function.js

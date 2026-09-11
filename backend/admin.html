@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PDF Maker — Private Admin Dashboard</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f7fb;
+  color:#172033;
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:25px 16px 40px;
+}
+
+h1{
+  margin:0;
+  font-size:26px;
+}
+
+.subtitle{
+  color:#667085;
+  margin:6px 0 24px;
+  font-size:14px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 4px 18px rgba(0,0,0,.04);
+}
+
+.auth-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+input{
+  flex:1;
+  min-width:220px;
+  padding:11px 12px;
+  border:1px solid #d0d5dd;
+  border-radius:9px;
+  font-size:14px;
+}
+
+button{
+  border:0;
+  border-radius:9px;
+  padding:11px 17px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+#loginBtn{
+  background:#111827;
+  color:#fff;
+}
+
+#refreshBtn{
+  background:#2563eb;
+  color:#fff;
+}
+
+#allDatesBtn{
+  background:#eef2ff;
+  color:#3730a3;
+}
+
+button:active{
+  transform:scale(.98);
+}
+
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.controls label{
+  font-size:13px;
+  font-weight:600;
+  color:#475467;
+}
+
+.date-box{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.date-box input{
+  min-width:160px;
+  flex:none;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.stat{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:16px;
+  padding:18px;
+}
+
+.stat-title{
+  color:#667085;
+  font-size:13px;
+}
+
+.stat-value{
+  font-size:30px;
+  font-weight:700;
+  margin-top:6px;
+}
+
+.table-wrap{
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:650px;
+}
+
+th,td{
+  text-align:left;
+  padding:13px 12px;
+  border-bottom:1px solid #eaecf0;
+  font-size:13px;
+}
+
+th{
+  background:#f9fafb;
+  color:#475467;
+  font-weight:700;
+}
+
+.status{
+  margin-top:10px;
+  font-size:13px;
+  color:#667085;
+}
+
+.error{
+  color:#b42318;
+}
+
+.hidden{
+  display:none;
+}
+
+.empty{
+  text-align:center;
+  padding:30px;
+  color:#667085;
+}
+
+@media(max-width:600px){
+  .stats{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:22px;
+  }
+
+  .auth-row{
+    flex-direction:column;
+  }
+
+  .auth-row input,
+  .auth-row button{
+    width:100%;
+  }
+
+  .date-box{
+    width:100%;
+  }
+
+  .date-box input{
+    flex:1;
+    width:100%;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="loginScreen" class="container">
+
+  <h1>PDF Maker — Private Admin Dashboard</h1>
+  <div class="subtitle">Private visitor monitoring dashboard</div>
+
+  <div class="card">
+    <div class="auth-row">
+      <input id="adminKey" type="password" placeholder="Enter Admin Key">
+      <button id="loginBtn">Access Dashboard</button>
+    </div>
+    <div id="status" class="status"></div>
+  </div>
+
+  </div></div><div id="dashboard" class="hidden">
+
+    <div class="card">
+      <div class="controls">
+
+        <div class="date-box">
+          <label for="datePicker">Date:</label>
+          <input id="datePicker" type="date">
+        </div>
+
+        <button id="allDatesBtn">All Dates</button>
+        <button id="refreshBtn">↻ Refresh</button>
+
+      </div>
+
+      <div id="selectedDateText" class="status"></div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-title">Total Visits</div>
+        <div id="totalVisits" class="stat-value">0</div>
+      </div>
+
+      <div class="stat">
+        <div class="stat-title">Unique Visitors</div>
+        <div id="uniqueVisitors" class="stat-value">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Device</th>
+              <th>OS</th>
+              <th>Browser</th>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Last Seen</th>
+            </tr>
+          </thead>
+
+          <tbody id="visitorTable">
+            <tr>
+              <td colspan="6" class="empty">No visitor data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+let allVisitors = [];
+let adminKey = "";
+let showingAllDates = false;
+
+const adminKeyInput = document.getElementById("adminKey");
+const loginBtn = document.getElementById("loginBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const allDatesBtn = document.getElementById("allDatesBtn");
+const datePicker = document.getElementById("datePicker");
+const dashboard = document.getElementById("dashboard");
+const loginScreen = document.getElementById("loginScreen");
+const statusBox = document.getElementById("status");
+const visitorTable = document.getElementById("visitorTable");
+const totalVisits = document.getElementById("totalVisits");
+const uniqueVisitors = document.getElementById("uniqueVisitors");
+const selectedDateText = document.getElementById("selectedDateText");
+
+function localDateString(date){
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,"0");
+  const d = String(date.getDate()).padStart(2,"0");
+  return y + "-" + m + "-" + d;
+}
+
+function formatDate(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString();
+}
+
+function formatTime(iso){
+  const d = new Date(iso);
+  return d.toLocaleTimeString();
+}
+
+function updateDateText(){
+  if(showingAllDates){
+    selectedDateText.textContent = "Showing visitors from all available dates.";
+  }else{
+    selectedDateText.textContent =
+      "Showing visitors for " + formatDate(datePicker.value + "T00:00:00");
+  }
+}
+
+function renderVisitors(){
+
+  let filtered = allVisitors.slice();
+
+  if(!showingAllDates){
+    const selected = datePicker.value;
+
+    filtered = filtered.filter(v => {
+      return localDateString(new Date(v.lastSeen)) === selected;
+    });
+  }
+
+  filtered.sort((a,b) => {
+    return new Date(b.lastSeen) - new Date(a.lastSeen);
+  });
+
+  totalVisits.textContent = filtered.length;
+
+  const uniqueIPs = new Set(filtered.map(v => v.ip || "unknown"));
+  uniqueVisitors.textContent = uniqueIPs.size;
+
+  visitorTable.innerHTML = "";
+
+  if(filtered.length === 0){
+    visitorTable.innerHTML =
+      '<tr><td colspan="6" class="empty">No visitors found for this date.</td></tr>';
+    updateDateText();
+    return;
+  }
+
+  filtered.forEach(v => {
+
+    const row = document.createElement("tr");
+
+    row.innerHTML =
+      "<td>" + (v.device || "Unknown") + "</td>" +
+      "<td>" + (v.os || "Unknown") + "</td>" +
+      "<td>" + (v.browser || "Unknown") + "</td>" +
+      "<td>" + formatDate(v.lastSeen) + "</td>" +
+      "<td>" + formatTime(v.lastSeen) + "</td>" +
+      "<td>" + new Date(v.lastSeen).toLocaleString() + "</td>";
+
+    visitorTable.appendChild(row);
+  });
+
+  updateDateText();
+}
+
+async function loadVisitors(){
+
+  if(!adminKey){
+    return;
+  }
+
+  statusBox.textContent = "Loading visitors...";
+  statusBox.className = "status";
+
+  try{
+
+    const response = await fetch(
+      "/api/admin/visitors",
+      {
+        headers:{
+          "x-admin-key":adminKey
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Access denied");
+    }
+
+    allVisitors = Array.isArray(data.visitors) ? data.visitors : [];
+
+    dashboard.classList.remove("hidden");
+loginScreen.classList.add("hidden");
+window.scrollTo(0,0);
+window.scrollTo(0,0);
+
+    statusBox.textContent =
+      "Dashboard updated successfully.";
+
+    renderVisitors();
+
+  }catch(error){
+
+    statusBox.textContent =
+      error.message || "Unable to load dashboard.";
+
+    statusBox.className = "status error";
+
+    dashboard.classList.add("hidden");
+loginScreen.classList.remove("hidden");
+  }
+}
+
+loginBtn.addEventListener("click", function(){
+
+  const key = adminKeyInput.value.trim();
+
+  if(!key){
+    statusBox.textContent = "Please enter your Admin Key.";
+    statusBox.className = "status error";
+    return;
+  }
+
+  adminKey = key;
+  loadVisitors();
+});
+
+refreshBtn.addEventListener("click", async function(){
+  if(!adminKey) return;
+  refreshBtn.disabled = true;
+  refreshBtn.textContent = "Refreshing...";
+  statusBox.textContent = "Refreshing visitor data...";
+  statusBox.className = "status";
+  await loadVisitors();
+  statusBox.textContent = "Dashboard updated successfully • Last refresh: " + new Date().toLocaleTimeString();
+  refreshBtn.disabled = false;
+  refreshBtn.textContent = "↻ Refresh";
+});
+
+datePicker.addEventListener("change", function(){
+  showingAllDates = false;
+  renderVisitors();
+});
+
+allDatesBtn.addEventListener("click", function(){
+  showingAllDates = true;
+  renderVisitors();
+});
+
+datePicker.value = localDateString(new Date());
+updateDateText();
+
+setInterval(function(){
+  if(adminKey && !dashboard.classList.contains("hidden")){
+    loadVisitors();
+  }
+},30000);
+</script>
+
+</body>
+</html>

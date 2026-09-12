@@ -630,9 +630,9 @@ app.get("/api/visit", function (req, res) {
 });
 
 app.get("/api/admin/visitors", function (req, res) {
-    const key = req.headers["x-admin-key"] || req.query.key;
+    const key = (req.headers["x-admin-key"] || req.query.key || "").trim();
 
-    if (!key || key !== process.env.ADMIN_KEY) {
+    if (!key || key !== (process.env.ADMIN_KEY || "").trim()) {
         return res.status(403).json({
             success: false,
             message: "Access denied"

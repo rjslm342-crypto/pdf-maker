@@ -446,6 +446,7 @@ input[type=file]{
 }
 
 .action-row{
+  position:relative;
   display:flex;
   gap:10px;
   flex-wrap:wrap;
@@ -1249,7 +1250,291 @@ footer{
 
 .top-location{position:fixed;top:6px;left:6px;z-index:9999;display:flex;align-items:center;gap:5px;color:#fff;font-size:6.4px;font-weight:600;line-height:1;background:transparent;border:0;box-shadow:none;padding:0}.top-location-icon{font-size:8px;line-height:1}.top-live-dot{width:6px;height:6px;border-radius:50%;background:#ff2020;display:inline-block;box-shadow:0 0 7px rgba(255,32,32,.8);animation:topLocationBlink 1.1s infinite ease-in-out}@keyframes topLocationBlink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.2;transform:scale(.7)}}50%{opacity:.2;transform:scale(.72)}}
 @media(max-width:600px){.top-location{top:10px;left:12px;font-size:7px}.top-location-icon{font-size:9px}.top-live-dot{width:4px;height:4px}}
-</style>
+
+/* =========================================================
+   IMAGE -> PDF PROGRESS STEPPER
+   ========================================================= */
+
+.image-pdf-progress{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:20px 12px;
+  box-sizing:border-box;
+  pointer-events:auto;
+  background:rgba(0,0,0,.62);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+
+.image-pdf-progress-box{
+  position:fixed;
+  width:min(430px,calc(100vw - 24px));
+  max-height:calc(100vh - 40px);
+  overflow:auto;
+  box-sizing:border-box;
+  padding:18px;
+  border-radius:24px;
+  background:linear-gradient(145deg,#E100A4 0%,#C80092 55%,#A9007C 100%);
+  color:#AEFFFE;
+  box-shadow:
+    0 22px 60px rgba(0,0,0,.48),
+    0 0 35px rgba(225,0,164,.22);
+  border:1px solid rgba(174,255,254,.38);
+  animation:imagePDFPopupIn .32s cubic-bezier(.16,1,.3,1);
+}
+
+@keyframes imagePDFPopupIn{
+  from{
+    opacity:0;
+    transform:translateX(-50%) translateY(22px) scale(.94);
+  }
+  to{
+    opacity:1;
+    transform:translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.image-pdf-progress-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:15px;
+}
+
+.image-pdf-progress-title{
+  font-size:19px;
+  font-weight:800;
+  color:#AEFFFE;
+}
+
+#imagePDFProgressText{
+  display:block;
+  margin-top:6px;
+  font-size:13px;
+  line-height:1.4;
+  color:#AEFFFE;
+  opacity:1;
+  visibility:visible;
+}
+
+#imagePDFProgressPercent{
+  font-size:18px;
+  font-weight:900;
+  color:#AEFFFE;
+  white-space:nowrap;
+  opacity:1;
+  visibility:visible;
+}
+
+.image-pdf-progress-bar{
+  position:relative;
+  width:100%;
+  height:11px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(174,255,254,.16);
+  margin-bottom:20px;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.16);
+}
+
+#imagePDFProgressFill{
+  position:relative;
+  width:0%;
+  height:100%;
+  overflow:hidden;
+  border-radius:999px;
+  background:linear-gradient(
+    90deg,
+    #AEFFFE,
+    #ffffff,
+    #AEFFFE
+  );
+  box-shadow:
+    0 0 9px rgba(174,255,254,.85),
+    0 0 20px rgba(174,255,254,.32);
+  transition:width .65s cubic-bezier(.16,1,.3,1);
+}
+
+#imagePDFProgressFill::after{
+  content:"";
+  position:absolute;
+  top:0;
+  left:-45%;
+  width:45%;
+  height:100%;
+  background:linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,.9),
+    transparent
+  );
+  animation:imagePDFBarShine 1.15s linear infinite;
+}
+
+@keyframes imagePDFBarShine{
+  from{
+    left:-45%;
+  }
+  to{
+    left:110%;
+  }
+}
+
+.image-pdf-steps{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:7px;
+}
+
+.image-pdf-step{
+  min-width:0;
+  text-align:center;
+  opacity:.52;
+  transition:opacity .3s ease,transform .3s ease;
+}
+
+.image-pdf-step > span{
+  width:32px;
+  height:32px;
+  margin:0 auto 7px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  font-size:12px;
+  font-weight:900;
+  color:#E100A4;
+  background:#AEFFFE;
+}
+
+.image-pdf-step b{
+  display:block;
+  font-size:11px;
+  color:#AEFFFE;
+  opacity:1;
+  visibility:visible;
+}
+
+.image-pdf-step small{
+  display:block;
+  margin-top:3px;
+  font-size:9px;
+  color:#AEFFFE;
+  opacity:.9;
+  visibility:visible;
+}
+
+.image-pdf-step.active{
+  opacity:1;
+  transform:translateY(-2px);
+}
+
+.image-pdf-step.active > span{
+  animation:imagePDFStepPulse 1.25s ease-in-out infinite;
+}
+
+@keyframes imagePDFStepPulse{
+  0%,100%{
+    transform:scale(1);
+    box-shadow:0 0 0 0 rgba(174,255,254,.55);
+  }
+  50%{
+    transform:scale(1.08);
+    box-shadow:0 0 0 7px rgba(174,255,254,0);
+  }
+}
+
+.image-pdf-step.completed{
+  opacity:1;
+}
+
+.image-pdf-progress-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:9px;
+  margin-top:18px;
+}
+
+.image-pdf-cancel,
+.image-pdf-close{
+  border:1px solid rgba(174,255,254,.45);
+  border-radius:10px;
+  padding:9px 17px;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  color:#E100A4;
+  background:#AEFFFE;
+}
+
+.image-pdf-cancel:active,
+.image-pdf-close:active{
+  transform:scale(.97);
+}
+
+.image-pdf-progress-error{
+  margin-top:16px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(0,0,0,.18);
+  border:1px solid rgba(174,255,254,.35);
+}
+
+.image-pdf-error-title{
+  font-size:13px;
+  font-weight:900;
+  color:#AEFFFE;
+  margin-bottom:5px;
+}
+
+#imagePDFProgressErrorText{
+  font-size:11px;
+  line-height:1.45;
+  color:#AEFFFE;
+  word-break:break-word;
+}
+
+@media(max-width:520px){
+  .image-pdf-progress-box{
+    width:calc(100% - 16px);
+    padding:16px;
+    border-radius:17px;
+  }
+
+  .image-pdf-progress-title{
+    font-size:17px;
+  }
+
+  #imagePDFProgressText{
+    font-size:12px;
+  }
+
+  #imagePDFProgressPercent{
+    font-size:16px;
+  }
+
+  .image-pdf-step > span{
+    width:29px;
+    height:29px;
+  }
+
+  .image-pdf-step b{
+    font-size:10px;
+  }
+
+  .image-pdf-step small{
+    display:none;
+  }
+
+  .image-pdf-progress-actions{
+    margin-top:15px;
+  }
+}\n</style>
 
 <style id="saved-documents-button-color">
 .feature[onclick="openTool('saved-documents')"]{
@@ -1409,14 +1694,14 @@ Choose Images
 <div class="field">
 <label>Orientation</label>
 <select id="imageOrientation">
-<option value="portrait">Portrait</option>
-<option value="landscape">Landscape</option>
-</select>
+                    <option value="portrait">Portrait</option>
+                    <option value="landscape" selected>Landscape</option>
+                  </select>
 </div>
 
 <div class="field">
 <label>Margin (mm)</label>
-<input id="imageMargin" type="number" value="10" min="0" max="50">
+<input id="imageMargin" type="number" value="2" min="0" max="50">
 </div>
 
 <div class="field">
@@ -1437,8 +1722,80 @@ Clear
 </div>
 
 <div id="imageStatus" class="status"></div>
+<div id="imagePDFProgress" class="image-pdf-progress" style="display:none">
+  <div class="image-pdf-progress-box">
 
-<div id="imageResult" class="result">
+    <div class="image-pdf-progress-head">
+      <div>
+        <div class="image-pdf-progress-title">Creating your PDF</div>
+        <div id="imagePDFProgressText">Preparing images...</div>
+      </div>
+
+      <div id="imagePDFProgressPercent">0%</div>
+    </div>
+
+    <div class="image-pdf-progress-bar">
+      <div id="imagePDFProgressFill"></div>
+    </div>
+
+    <div class="image-pdf-steps">
+
+      <div class="image-pdf-step active" data-step="1">
+        <span>1</span>
+        <div>
+          <b>Prepare</b>
+          <small>Optimizing images</small>
+        </div>
+      </div>
+
+      <div class="image-pdf-step" data-step="2">
+        <span>2</span>
+        <div>
+          <b>Upload</b>
+          <small>Sending images</small>
+        </div>
+      </div>
+
+      <div class="image-pdf-step" data-step="3">
+        <span>3</span>
+        <div>
+          <b>Process</b>
+          <small>Creating PDF</small>
+        </div>
+      </div>
+
+      <div class="image-pdf-step" data-step="4">
+        <span>4</span>
+        <div>
+          <b>Download</b>
+          <small>Saving PDF</small>
+        </div>
+      </div>
+
+    </div>
+
+    <div id="imagePDFProgressError" class="image-pdf-progress-error" style="display:none">
+      <div class="image-pdf-error-title">PDF creation failed</div>
+      <div id="imagePDFProgressErrorText"></div>
+    </div>
+
+    <div class="image-pdf-progress-actions">
+  <div class="image-pdf-progress-note" style="font-size:15px;font-weight:700;line-height:1.5;">
+    ⚠️ Please DO NOT close, refresh, or leave this screen until your PDF is ready.
+  </div>
+
+  <button
+    id="imagePDFCloseBtn"
+    type="button"
+    class="image-pdf-close"
+    style="display:none">
+    Close
+  </button>
+</div>
+    </div>
+  </div>
+
+      <div id="imageResult" class="result">
 <strong>PDF Ready ✅</strong>
 
 <div class="action-row">
@@ -2102,7 +2459,8 @@ const imageInput=document.getElementById("imageInput");
 
 imageInput.addEventListener("change",function(){
 
-  const files=Array.from(this.files);
+  const MAX_IMAGES=45;
+  const files=Array.from(this.files); const limitReached=selectedFiles.length + files.length > MAX_IMAGES;
 
   files.forEach(file=>{
 
@@ -2110,10 +2468,12 @@ imageInput.addEventListener("change",function(){
       file.type==="image/jpeg" ||
       file.type==="image/png"
     ){
-      selectedFiles.push(file);
+      if(selectedFiles.length < MAX_IMAGES){ selectedFiles.push(file); }
     }
 
   });
+
+  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
 
   renderImages();
   imageInput.value="";
@@ -2122,70 +2482,198 @@ imageInput.addEventListener("change",function(){
 
 function renderImages(){
 
-  const list=document.getElementById("imageFileList");
+  const list =
+    document.getElementById(
+      "imageFileList"
+    );
+
+  /*
+    Release previous preview URLs.
+  */
+
+  if(window.imagePreviewURLs){
+
+    window.imagePreviewURLs.forEach(
+      function(url){
+
+        try{
+          URL.revokeObjectURL(url);
+        }catch(error){}
+
+      }
+    );
+
+  }
+
+  window.imagePreviewURLs=[];
 
   list.innerHTML="";
 
-  selectedFiles.forEach((file,index)=>{
+  selectedFiles.forEach(
+    function(file,index){
 
-    const item=document.createElement("div");
-    item.className="file-item";
+      const item =
+        document.createElement(
+          "div"
+        );
 
-    const img=document.createElement("img");
-    img.className="file-preview";
-    img.src=URL.createObjectURL(file);
+      item.className="file-item";
 
-    const info=document.createElement("div");
-    info.className="file-info";
+      /*
+        Preview image.
 
-    const name=document.createElement("div");
-    name.className="file-name";
-    name.textContent=file.name;
+        Lazy loading prevents the browser from
+        immediately decoding hundreds of images.
+      */
 
-    const size=document.createElement("div");
-    size.className="file-size";
-    size.textContent=formatBytes(file.size);
+      const img =
+        document.createElement(
+          "img"
+        );
 
-    info.appendChild(name);
-    info.appendChild(size);
+      img.className="file-preview";
 
-    const actions=document.createElement("div");
-    actions.className="file-actions";
+      img.loading="lazy";
+      img.decoding="async";
 
-    const up=document.createElement("button");
-    up.className="icon-btn";
-    up.textContent="↑";
-    up.onclick=()=>moveImage(index,-1);
+      /*
+        Keep previews small at the browser level.
+        CSS controls the visual size.
+      */
 
-    const down=document.createElement("button");
-    down.className="icon-btn";
-    down.textContent="↓";
-    down.onclick=()=>moveImage(index,1);
+      img.width=120;
+      img.height=90;
 
-    const crop=document.createElement("button");
-    crop.className="icon-btn";
-    crop.textContent="✂";
-    crop.onclick=()=>openCrop(index);
+      const previewURL =
+        URL.createObjectURL(file);
 
-    const rotate=document.createElement("button");
-    rotate.className="icon-btn";
-    rotate.textContent="↻";
-    rotate.onclick=()=>rotateImage(index);
+      window.imagePreviewURLs.push(
+        previewURL
+      );
 
-    const remove=document.createElement("button");
-    remove.className="icon-btn";
-    remove.textContent="×";
-    remove.onclick=()=>removeImage(index);
+      img.src=previewURL;
 
-    actions.append(up,down,crop,rotate,remove);
+      const info =
+        document.createElement(
+          "div"
+        );
 
-    item.append(img,info,actions);
+      info.className="file-info";
 
-    list.appendChild(item);
-  });
+      const name =
+        document.createElement(
+          "div"
+        );
 
-  document.getElementById("createImagesPDF").disabled =
+      name.className="file-name";
+
+      name.textContent =
+        file.name;
+
+      const size =
+        document.createElement(
+          "div"
+        );
+
+      size.className="file-size";
+
+      size.textContent =
+        formatBytes(file.size);
+
+      info.appendChild(name);
+      info.appendChild(size);
+
+      const actions =
+        document.createElement(
+          "div"
+        );
+
+      actions.className="file-actions";
+
+      const up =
+        document.createElement(
+          "button"
+        );
+
+      up.className="icon-btn";
+      up.textContent="↑";
+
+      up.onclick=function(){
+        moveImage(index,-1);
+      };
+
+      const down =
+        document.createElement(
+          "button"
+        );
+
+      down.className="icon-btn";
+      down.textContent="↓";
+
+      down.onclick=function(){
+        moveImage(index,1);
+      };
+
+      const crop =
+        document.createElement(
+          "button"
+        );
+
+      crop.className="icon-btn";
+      crop.textContent="✂";
+
+      crop.onclick=function(){
+        openCrop(index);
+      };
+
+      const rotate =
+        document.createElement(
+          "button"
+        );
+
+      rotate.className="icon-btn";
+      rotate.textContent="↻";
+
+      rotate.onclick=function(){
+        rotateImage(index);
+      };
+
+      const remove =
+        document.createElement(
+          "button"
+        );
+
+      remove.className="icon-btn";
+      remove.textContent="×";
+
+      remove.onclick=function(){
+        removeImage(index);
+      };
+
+      actions.append(
+        up,
+        down,
+        crop,
+        rotate,
+        remove
+      );
+
+      item.append(
+        img,
+        info,
+        actions
+      );
+
+      list.appendChild(item);
+
+    }
+  );
+
+  document.getElementById(
+    "createImagesPDF"
+  ).disabled =
     selectedFiles.length===0;
+
 }
 
 
@@ -2203,6 +2691,8 @@ function formatBytes(bytes){
 function removeImage(index){
 
   selectedFiles.splice(index,1);
+  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+
   renderImages();
 }
 
@@ -2219,6 +2709,8 @@ function moveImage(index,direction){
   selectedFiles[index]=selectedFiles[newIndex];
   selectedFiles[newIndex]=temp;
 
+  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+
   renderImages();
 }
 
@@ -2226,6 +2718,8 @@ function moveImage(index,direction){
 function clearImages(){
 
   selectedFiles=[];
+  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+
   renderImages();
 
   document.getElementById("imageStatus").style.display="none";
@@ -2267,7 +2761,9 @@ async function rotateImage(index){
       {type:"image/jpeg"}
     );
 
-    renderImages();
+    if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+
+  renderImages();
 
   },"image/jpeg",.95);
 }
@@ -2735,7 +3231,9 @@ async function applyCrop(){
       );
 
       closeCrop();
-      renderImages();
+      if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+
+  renderImages();
 
     },"image/jpeg",.95);
 
@@ -2759,110 +3257,278 @@ document
 .addEventListener("click",createImagesPDF);
 
 
-async function createImagesPDF(){
+async function prepareImageForPDF(file){
+  if(!file||!file.type.startsWith("image/"))return file;
+  const MAX_DIMENSION=1800;
+  const JPEG_QUALITY=0.82;
+  return new Promise(function(resolve){
+    const url=URL.createObjectURL(file);
+    const img=new Image();
+    img.onload=function(){
+      try{
+        const width=img.naturalWidth||img.width;
+        const height=img.naturalHeight||img.height;
+        if(!width||!height){URL.revokeObjectURL(url);resolve(file);return;}
+        const scale=Math.min(1,MAX_DIMENSION/Math.max(width,height));
+        const targetWidth=Math.max(1,Math.round(width*scale));
+        const targetHeight=Math.max(1,Math.round(height*scale));
+        const canvas=document.createElement("canvas");
+        canvas.width=targetWidth;canvas.height=targetHeight;
+        const ctx=canvas.getContext("2d");
+        if(!ctx){URL.revokeObjectURL(url);resolve(file);return;}
+        ctx.drawImage(img,0,0,targetWidth,targetHeight);
+        canvas.toBlob(function(blob){
+          URL.revokeObjectURL(url);
+          if(!blob){resolve(file);return;}
+          const optimizedFile=new File([blob],file.name.replace(/\\.[^.]+$/,"")+".jpg",{type:"image/jpeg",lastModified:Date.now()});
+          resolve(optimizedFile.size<file.size?optimizedFile:file);
+        },"image/jpeg",JPEG_QUALITY);
+      }catch(error){URL.revokeObjectURL(url);console.warn("Image optimization skipped:",error);resolve(file);}
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);resolve(file);};
+    img.src=url;
+  });
+}
 
+async function createImagesPDF(){
   if(selectedFiles.length===0)
     return;
 
-  const status=document.getElementById("imageStatus");
+  const status =
+    document.getElementById("imageStatus");
 
-  status.style.display="block";
-  status.textContent="Creating PDF... Please wait.";
+  const total =
+    selectedFiles.length;
+
+  const pageSize =
+    document.getElementById("imagePageSize").value;
+
+  const orientation =
+    document.getElementById("imageOrientation").value;
+
+  let margin =
+    Number(document.getElementById("imageMargin").value);
+
+  if(!Number.isFinite(margin))
+    margin = 2;
+
+  margin = Math.max(0, Math.min(50, margin));
+
+  const filenameInput =
+    document.getElementById("imageFilename").value.trim();
+
+  const filename =
+    filenameInput || "document.pdf";
+
+  status.style.display = "block";
+
+  imagePDFAbortController = new AbortController();
+  imagePDFCancelled = false;
+
+  showImagePDFProgress();
+
+  updateImagePDFProgress(
+    1,
+    5,
+    "Preparing images..."
+  );
 
   try{
+    const formData = new FormData();
 
-    const formData=new FormData();
+    for(let i=0;i<selectedFiles.length;i++){
+      const preparePercent =
+        5 + Math.round(((i + 1) / total) * 15);
 
-    selectedFiles.forEach(file=>{
-      formData.append("images",file);
-    });
+      status.textContent =
+        "Optimizing images... " +
+        (i + 1) +
+        " / " +
+        total;
 
-    formData.append(
-      "pageSize",
-      document.getElementById("imagePageSize").value
+      updateImagePDFProgress(
+        1,
+        preparePercent,
+        "Optimizing image " +
+        (i + 1) +
+        " of " +
+        total
+      );
+
+      const optimizedFile =
+        await prepareImageForPDF(
+          selectedFiles[i]
+        );
+
+      formData.append(
+        "images",
+        optimizedFile,
+        optimizedFile.name
+      );
+    }
+
+    formData.append("pageSize", pageSize);
+    formData.append("orientation", orientation);
+    formData.append("margin", String(margin));
+
+    updateImagePDFProgress(
+      2,
+      25,
+      "Uploading images to server..."
     );
 
-    formData.append(
-      "orientation",
-      document.getElementById("imageOrientation").value
+    status.textContent =
+      "Uploading images to server...";
+
+    const response =
+      await fetch(
+        API_URL + "/api/pdf/images",
+        {
+          method: "POST",
+          body: formData,
+          signal: imagePDFAbortController.signal
+        }
+      );
+
+    if(!response.ok){
+      let errorMessage =
+        "Backend PDF generation failed.";
+
+      try{
+        const errorText =
+          await response.text();
+
+        if(errorText)
+          errorMessage = errorText;
+      }catch(error){}
+
+      throw new Error(errorMessage);
+    }
+
+    updateImagePDFProgress(
+      3,
+      55,
+      "Server is creating your PDF..."
     );
 
-    formData.append(
-      "margin",
-      document.getElementById("imageMargin").value
+    status.textContent =
+      "PDF is being created by server...";
+
+    const blob =
+      await response.blob();
+
+    if(!blob || blob.size===0)
+      throw new Error(
+        "Server returned an empty PDF."
+      );
+
+    updateImagePDFProgress(
+      4,
+      85,
+      "PDF created. Preparing download..."
     );
 
-    formData.append(
-      "filename",
-      document.getElementById("imageFilename").value
-    );
+    status.textContent =
+      "PDF created by server. Downloading...";
 
-    const response=await fetch(
-      `${API_URL}/api/pdf/images`,
-      {
-        method:"POST",
-        body:formData
-      }
-    );
+    lastPDFBlob = blob;
 
-    if(!response.ok)
-      throw new Error("PDF server error");
-
-    const blob=await response.blob();
-
-    lastPDFBlob=blob;
-
-    if(lastPDFURL)
-      URL.revokeObjectURL(lastPDFURL);
-
-    /* Save generated Images → PDF */
+    if(lastPDFURL){
+      try{
+        URL.revokeObjectURL(lastPDFURL);
+      }catch(error){}
+    }
 
     const imageTitle =
-      document.getElementById("imageFilename").value
-      || "Images PDF";
+      filename.replace(/\.pdf$/i, "") ||
+      "Images PDF";
 
     await savePDFBlobToSavedDocuments(
       blob,
-      imageTitle.replace(/\\.pdf$/i,""),
+      imageTitle,
       "Images → PDF"
     );
 
+    updateImagePDFProgress(
+      4,
+      94,
+      "Starting PDF download..."
+    );
 
-    lastPDFURL=URL.createObjectURL(blob);
+    lastPDFURL =
+      URL.createObjectURL(blob);
 
-    const filename=
-      document.getElementById("imageFilename").value
-      || "document.pdf";
+    const downloadName =
+      filename.toLowerCase().endsWith(".pdf")
+        ? filename
+        : filename + ".pdf";
 
-    const a=document.createElement("a");
+    const a =
+      document.createElement("a");
 
-    a.href=lastPDFURL;
-    a.download=filename.endsWith(".pdf")
-      ?filename
-      :filename+".pdf";
+    a.href = lastPDFURL;
+    a.download = downloadName;
 
+    document.body.appendChild(a);
     a.click();
+    a.remove();
 
-    document.getElementById("imageResult")
-      .style.display="block";
+    document.getElementById(
+      "imageResult"
+    ).style.display = "block";
 
-    status.textContent=
+    completeImagePDFProgress();
+
+    status.textContent =
       "PDF successfully created and downloaded. ✅";
+
+    setTimeout(function(){
+      hideImagePDFProgress();
+    }, 1200);
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      "Backend Images → PDF error:",
+      error
+    );
 
-    status.textContent=
-      status.textContent="Failed to create the PDF. Error: " + (error && error.message ? error.message : String(error));
+    if(
+      error &&
+      error.name === "AbortError"
+    ){
+      showImagePDFProgressError(
+        "The PDF generation request was cancelled.",
+        true
+      );
 
+      status.textContent =
+        "PDF creation cancelled.";
+
+      return;
+    }
+
+    const errorMessage =
+      error && error.message
+        ? error.message
+        : String(error);
+
+    updateImagePDFProgress(
+      3,
+      55,
+      "PDF generation failed."
+    );
+
+    showImagePDFProgressError(
+      errorMessage,
+      false
+    );
+
+    status.textContent =
+      "Failed to create the PDF. Error: " +
+      errorMessage;
   }
 }
-
-
-/* =========================================================
-   TEXT EDITOR — WYSIWYG EDITOR
-========================================================= */
 
 const editor = document.getElementById("editorContent");
 
@@ -6518,7 +7184,364 @@ document.addEventListener("DOMContentLoaded", function(){
     .catch(function(){});
 })();
 </script>
-</body>
+
+<script>
+/* =========================================================
+   IMAGE -> PDF PROGRESS STEPPER CONTROLLER
+   ========================================================= */
+
+let imagePDFAnimatedPercent = 0;
+let imagePDFAnimationFrame = null;
+let imagePDFAbortController = null;
+let imagePDFCancelled = false;
+
+function animateImagePDFPercent(target){
+  target = Math.max(0, Math.min(100, Number(target) || 0));
+
+  if(imagePDFAnimationFrame){
+    cancelAnimationFrame(imagePDFAnimationFrame);
+  }
+
+  const percentEl =
+    document.getElementById("imagePDFProgressPercent");
+
+  const fill =
+    document.getElementById("imagePDFProgressFill");
+
+  if(!percentEl || !fill){
+    return;
+  }
+
+  const startValue = imagePDFAnimatedPercent;
+  const difference = target - startValue;
+  const duration =
+    Math.max(450, Math.min(1200, Math.abs(difference) * 16));
+
+  const startTime = performance.now();
+
+  function frame(now){
+    const elapsed = now - startTime;
+    const progress =
+      Math.min(1, elapsed / duration);
+
+    const eased =
+      1 - Math.pow(1 - progress, 3);
+
+    const value =
+      startValue + difference * eased;
+
+    imagePDFAnimatedPercent = value;
+
+    percentEl.textContent =
+      Math.round(value) + "%";
+
+    fill.style.width =
+      value + "%";
+
+    if(progress < 1){
+      imagePDFAnimationFrame =
+        requestAnimationFrame(frame);
+    }else{
+      imagePDFAnimatedPercent = target;
+      percentEl.textContent =
+        Math.round(target) + "%";
+      fill.style.width =
+        target + "%";
+    }
+  }
+
+  imagePDFAnimationFrame =
+    requestAnimationFrame(frame);
+}
+
+function updateImagePDFProgress(step, percent, text){
+  const modal =
+    document.getElementById("imagePDFProgress");
+
+  const textEl =
+    document.getElementById("imagePDFProgressText");
+
+  if(!modal){
+    return;
+  }
+
+  const button =
+    document.getElementById("createImagesPDF");
+
+  if(
+    button &&
+    button.parentElement &&
+    modal.parentElement !== button.parentElement
+  ){
+    button.parentElement.appendChild(modal);
+  }
+
+  modal.style.display = "flex";
+
+  if(textEl){
+    textEl.textContent = text || "";
+    textEl.style.visibility = "visible";
+    textEl.style.opacity = "1";
+  }
+
+  animateImagePDFPercent(percent);
+
+  document
+    .querySelectorAll(".image-pdf-step")
+    .forEach(function(el){
+      const stepNumber =
+        Number(el.dataset.step);
+
+      el.classList.remove("active");
+      el.classList.remove("completed");
+
+      if(stepNumber < step){
+        el.classList.add("completed");
+      }else if(stepNumber === step){
+        el.classList.add("active");
+      }
+    });
+}
+
+
+function lockImagePDFBackground(){
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+  document.body.style.touchAction = "none";
+}
+
+function unlockImagePDFBackground(){
+  document.documentElement.style.overflow = "";
+  document.body.style.overflow = "";
+  document.body.style.touchAction = "";
+}
+
+function showImagePDFProgress(){
+  lockImagePDFBackground();
+  const modal =
+    document.getElementById("imagePDFProgress");
+
+  const button =
+    document.getElementById("createImagesPDF");
+
+  if(
+    modal &&
+    button &&
+    button.parentElement
+  ){
+    button.parentElement.appendChild(modal);
+  }
+
+  imagePDFAnimatedPercent = 0;
+  imagePDFCancelled = false;
+
+  if(modal){
+    modal.style.display = "flex";
+
+    const box =
+      modal.querySelector(".image-pdf-progress-box");
+
+    if(box){
+      box.style.position = "fixed";
+      box.style.left = "50%";
+      box.style.bottom = "24px";
+      box.style.top = "auto";
+      box.style.transform = "translateX(-50%)";
+    }
+  }
+
+  const errorBox =
+    document.getElementById("imagePDFProgressError");
+
+  const errorText =
+    document.getElementById("imagePDFProgressErrorText");
+
+  const cancelBtn =
+    document.getElementById("imagePDFCancelBtn");
+
+  const closeBtn =
+    document.getElementById("imagePDFCloseBtn");
+
+  if(errorBox){
+    errorBox.style.display = "none";
+  }
+
+  if(errorText){
+    errorText.textContent = "";
+  }
+
+  if(cancelBtn){
+    cancelBtn.style.display = "inline-flex";
+    cancelBtn.disabled = false;
+  }
+
+  if(closeBtn){
+    closeBtn.style.display = "none";
+  }
+
+  updateImagePDFProgress(
+    1,
+    5,
+    "Preparing images..."
+  );
+}
+
+function hideImagePDFProgress(){
+  unlockImagePDFBackground();
+  const modal =
+    document.getElementById("imagePDFProgress");
+
+  if(imagePDFAnimationFrame){
+    cancelAnimationFrame(imagePDFAnimationFrame);
+    imagePDFAnimationFrame = null;
+  }
+
+  if(modal){
+    modal.style.display = "none";
+  }
+}
+
+function showImagePDFProgressError(message, cancelled){
+  const modal =
+    document.getElementById("imagePDFProgress");
+
+  const errorBox =
+    document.getElementById("imagePDFProgressError");
+
+  const errorText =
+    document.getElementById("imagePDFProgressErrorText");
+
+  const cancelBtn =
+    document.getElementById("imagePDFCancelBtn");
+
+  const closeBtn =
+    document.getElementById("imagePDFCloseBtn");
+
+  if(modal){
+    modal.style.display = "flex";
+  }
+
+  if(errorBox){
+    errorBox.style.display = "block";
+  }
+
+  if(errorText){
+    errorText.textContent =
+      message ||
+      (cancelled
+        ? "PDF generation was cancelled."
+        : "Something went wrong while creating the PDF.");
+  }
+
+  if(cancelBtn){
+    cancelBtn.style.display = "none";
+  }
+
+  if(closeBtn){
+    closeBtn.style.display = "inline-flex";
+  }
+
+  document
+    .querySelectorAll(".image-pdf-step")
+    .forEach(function(el){
+      el.classList.remove("active");
+    });
+}
+
+function cancelImagePDFCreation(){
+  if(imagePDFCancelled){
+    return;
+  }
+
+  imagePDFCancelled = true;
+
+  if(imagePDFAbortController){
+    try{
+      imagePDFAbortController.abort();
+    }catch(error){}
+  }
+
+  if(imagePDFAnimationFrame){
+    cancelAnimationFrame(imagePDFAnimationFrame);
+    imagePDFAnimationFrame = null;
+  }
+
+  showImagePDFProgressError(
+    "The PDF generation request was cancelled.",
+    true
+  );
+
+  const status =
+    document.getElementById("imageStatus");
+
+  if(status){
+    status.textContent =
+      "PDF creation cancelled.";
+  }
+}
+
+function closeImagePDFProgress(){
+  hideImagePDFProgress();
+
+  const errorBox =
+    document.getElementById("imagePDFProgressError");
+
+  const errorText =
+    document.getElementById("imagePDFProgressErrorText");
+
+  const closeBtn =
+    document.getElementById("imagePDFCloseBtn");
+
+  if(errorBox){
+    errorBox.style.display = "none";
+  }
+
+  if(errorText){
+    errorText.textContent = "";
+  }
+
+  if(closeBtn){
+    closeBtn.style.display = "none";
+  }
+}
+
+function completeImagePDFProgress(){
+  updateImagePDFProgress(
+    4,
+    100,
+    "PDF ready successfully."
+  );
+
+  document
+    .querySelectorAll(".image-pdf-step")
+    .forEach(function(el){
+      el.classList.remove("active");
+      el.classList.add("completed");
+    });
+}
+
+document.addEventListener("click", function(event){
+  const cancelBtn =
+    event.target.closest("#imagePDFCancelBtn");
+
+  const closeBtn =
+    event.target.closest("#imagePDFCloseBtn");
+
+  if(cancelBtn){
+    event.preventDefault();
+    event.stopPropagation();
+    cancelImagePDFCreation();
+    return;
+  }
+
+  if(closeBtn){
+    event.preventDefault();
+    event.stopPropagation();
+    closeImagePDFProgress();
+  }
+});
+</script>
+\n</body>
 </html>
 
 <style>

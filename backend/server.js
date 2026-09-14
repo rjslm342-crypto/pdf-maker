@@ -78,7 +78,7 @@ const upload = multer({
 
         fileSize: 20 * 1024 * 1024,
 
-        files: 20
+        files: 45
 
     },
 
@@ -131,7 +131,7 @@ app.get("/api/health", function (req, res) {
 
 app.post(
     "/api/pdf/images",
-    upload.array("images", 20),
+    upload.array("images", 500),
 
     async function (req, res) {
 
@@ -256,144 +256,399 @@ app.post(
             // PROCESS EACH IMAGE
             // =================================
 
-            for (const file of req.files) {
+            // =================================
+            // UNIVERSAL IMAGE PROCESSING
+            // =================================
 
-                const imageBytes =
-                    fs.readFileSync(
-                        file.path
-                    );
+            /*
+              cross-image is pure JavaScript and does not
+              require native libraries such as sharp.
 
-                let image;
+              It decodes the uploaded file directly from
+              its bytes instead of relying on the browser.
+            */
 
-                // -----------------------------
-                // PNG
-                // -----------------------------
+            const {
+                Image
+            } = await import("cross-image");
 
-                if (
-                    file.mimetype ===
-                    "image/png"
-                ) {
+            /*
+              96 DPI is enough for normal PDF viewing and
+              printing while keeping 400+ image PDFs
+              considerably more memory efficient.
+            */
 
-                    image =
-                        await pdfDoc.embedPng(
-                            imageBytes
+            const DPI = 96;
+
+            const pointsToPixels =
+                DPI / 72;
+
+            const maxImageWidth =
+                Math.max(
+                    1,
+                    Math.round(
+                        pageWidth * pointsToPixels
+                    )
+                );
+
+            const maxImageHeight =
+                Math.max(
+                    1,
+                    Math.round(
+                        pageHeight * pointsToPixels
+                    )
+                );
+
+            for (
+                let imageIndex = 0;
+                imageIndex < req.files.length;
+                imageIndex++
+            ) {
+
+                const file =
+                    req.files[imageIndex];
+
+                console.log(
+                    "Processing image " +
+                    (imageIndex + 1) +
+                    "/" +
+                    req.files.length +
+                    ": " +
+                    file.originalname +
+                    " (" +
+                    file.mimetype +
+                    ", " +
+                    file.size +
+                    " bytes)"
+                );
+
+                let image = null;
+                let jpegBytes = null;
+
+                try {
+
+                    // -----------------------------
+                    // Read original bytes
+                    // -----------------------------
+
+                    const imageStartTime = Date.now();
+
+                    const imageBytes =
+                        fs.readFileSync(
+                            file.path
                         );
 
+                    // -----------------------------
+                    // JPEG FAST PATH
+                    // -----------------------------
+
+                    if (file.mimetype === "image/jpeg") {
+                console.log("JPEG normalization: decoding and re-encoding JPEG");
+                image = await Image.decode(new Uint8Array(imageBytes), { tolerantDecoding:true, runtimeDecoding:"prefer" });
+                if (!image || !image.width || !image.height) {
+                    throw new Error("JPEG decoder returned invalid dimensions");
                 }
+                jpegBytes = await image.encode("jpeg", { quality:82, progressive:false });
+                console.log("JPEG normalized:", jpegBytes.length, "bytes");
+            } else {
 
-                // -----------------------------
-                // JPG / JPEG
-                // -----------------------------
+                        // -----------------------------
+                        // Universal decode
+                        // -----------------------------
 
-                else {
+                        image =
+                            await Image.decode(
+                                new Uint8Array(
+                                    imageBytes
+                                ),
+                                {
+                                    tolerantDecoding:true,
+                                    runtimeDecoding:"prefer",
+                                    onWarning:function(
+                                        message,
+                                        details
+                                    ){
+                                        console.warn(
+                                            "Image warning:",
+                                            file.originalname,
+                                            message,
+                                            details || ""
+                                        );
+                                    }
+                                }
+                            );
 
-                    image =
-                        await pdfDoc.embedJpg(
-                            imageBytes
+                        if (
+                            !image ||
+                            !image.width ||
+                            !image.height
+                        ) {
+
+                            throw new Error(
+                                "Image decoder returned invalid dimensions"
+                            );
+
+                        }
+
+                        console.log(
+                            "Decoded:",
+                            image.width +
+                            "x" +
+                            image.height
                         );
 
-                }
+                        console.log(
+                            "Decode time:",
+                            (Date.now() - imageStartTime) + " ms"
+                        );
 
-                // -----------------------------
-                // Create page
-                // -----------------------------
+                        // -----------------------------
+                        // Calculate memory-friendly size
+                        // -----------------------------
 
-                const page =
-                    pdfDoc.addPage([
-                        pageWidth,
-                        pageHeight
-                    ]);
+                        const scale =
+                            Math.min(
+                                1,
+                                maxImageWidth /
+                                image.width,
+                                maxImageHeight /
+                                image.height
+                            );
 
-                // -----------------------------
-                // Available area
-                // -----------------------------
+                        if (scale < 1) {
 
-                const availableWidth =
-                    Math.max(
-                        1,
-                        pageWidth -
-                        margin * 2
-                    );
+                            image.resize({
+                                width:Math.max(
+                                    1,
+                                    Math.round(
+                                        image.width *
+                                        scale
+                                    )
+                                ),
+                                height:Math.max(
+                                    1,
+                                    Math.round(
+                                        image.height *
+                                        scale
+                                    )
+                                ),
+                                fit:"fit",
+                                method:"bicubic"
+                            });
 
-                const availableHeight =
-                    Math.max(
-                        1,
-                        pageHeight -
-                        margin * 2
-                    );
+                        }
 
-                // -----------------------------
-                // Image ratio
-                // -----------------------------
+                        // -----------------------------
+                        // Convert non-JPEG image to JPEG
+                        // -----------------------------
 
-                const imageRatio =
-                    image.width /
-                    image.height;
+                        const encodeStartTime = Date.now();
 
-                const pageRatio =
-                    availableWidth /
-                    availableHeight;
+                        jpegBytes =
+                            await image.encode(
+                                "jpeg",
+                                {
+                                    quality:82,
+                                    progressive:false
+                                }
+                            );
 
-                let drawWidth;
-                let drawHeight;
-
-                // -----------------------------
-                // Fit image
-                // -----------------------------
-
-                if (
-                    imageRatio >
-                    pageRatio
-                ) {
-
-                    drawWidth =
-                        availableWidth;
-
-                    drawHeight =
-                        drawWidth /
-                        imageRatio;
-
-                } else {
-
-                    drawHeight =
-                        availableHeight;
-
-                    drawWidth =
-                        drawHeight *
-                        imageRatio;
-
-                }
-
-                // -----------------------------
-                // Center image
-                // -----------------------------
-
-                const x =
-                    (pageWidth -
-                        drawWidth) / 2;
-
-                const y =
-                    (pageHeight -
-                        drawHeight) / 2;
-
-                // -----------------------------
-                // Draw image
-                // -----------------------------
-
-                page.drawImage(
-                    image,
-                    {
-
-                        x: x,
-
-                        y: y,
-
-                        width: drawWidth,
-
-                        height: drawHeight
+                        console.log(
+                            "JPEG encode time:",
+                            (Date.now() - encodeStartTime) + " ms",
+                            "output:",
+                            jpegBytes ? jpegBytes.length : 0,
+                            "bytes"
+                        );
 
                     }
-                );
+
+                    // -----------------------------
+                    // Validate decoded image only for non-JPEG
+                    // -----------------------------
+
+                    if (file.mimetype !== "image/jpeg") {
+
+                        if (
+                            !image ||
+                            !image.width ||
+                            !image.height
+                        ) {
+
+                            throw new Error(
+                                "Image decoder returned invalid dimensions"
+                            );
+
+                        }
+
+                        console.log(
+                            "Decoded:",
+                            image.width +
+                            "x" +
+                            image.height
+                        );
+
+                        console.log(
+                            "Decode time:",
+                            (Date.now() - imageStartTime) + " ms"
+                        );
+
+                    }
+
+
+                    // -----------------------------
+                    // Embed normalized JPEG
+                    // -----------------------------
+
+                    const pdfImage =
+                        await pdfDoc.embedJpg(
+                            jpegBytes
+                        );
+
+                    // -----------------------------
+                    // Create PDF page
+                    // -----------------------------
+
+                    const page =
+                        pdfDoc.addPage([
+                            pageWidth,
+                            pageHeight
+                        ]);
+
+                    // -----------------------------
+                    // Available area
+                    // -----------------------------
+
+                    const availableWidth =
+                        Math.max(
+                            1,
+                            pageWidth -
+                            margin * 2
+                        );
+
+                    const availableHeight =
+                        Math.max(
+                            1,
+                            pageHeight -
+                            margin * 2
+                        );
+
+                    // -----------------------------
+                    // Image ratio
+                    // -----------------------------
+
+                    const imageRatio =
+                        pdfImage.width /
+                        pdfImage.height;
+
+                    const pageRatio =
+                        availableWidth /
+                        availableHeight;
+
+                    let drawWidth;
+                    let drawHeight;
+
+                    if (
+                        imageRatio >
+                        pageRatio
+                    ) {
+
+                        drawWidth =
+                            availableWidth;
+
+                        drawHeight =
+                            drawWidth /
+                            imageRatio;
+
+                    } else {
+
+                        drawHeight =
+                            availableHeight;
+
+                        drawWidth =
+                            drawHeight *
+                            imageRatio;
+
+                    }
+
+                    // -----------------------------
+                    // Center image
+                    // -----------------------------
+
+                    const x =
+                        (
+                            pageWidth -
+                            drawWidth
+                        ) / 2;
+
+                    const y =
+                        (
+                            pageHeight -
+                            drawHeight
+                        ) / 2;
+
+                    // -----------------------------
+                    // Draw image
+                    // -----------------------------
+
+                    page.drawImage(
+                        pdfImage,
+                        {
+                            x:x,
+                            y:y,
+                            width:drawWidth,
+                            height:drawHeight
+                        }
+                    );
+
+                    console.log(
+                        "Image " +
+                        (imageIndex + 1) +
+                        " processed successfully."
+                    );
+
+                } catch (imageError) {
+
+                    console.error(
+                        "Image processing failed:",
+                        file.originalname,
+                        imageError
+                    );
+
+                    throw new Error(
+                        "Image " +
+                        (imageIndex + 1) +
+                        " (" +
+                        file.originalname +
+                        ") could not be processed. " +
+                        (
+                            imageError &&
+                            imageError.message
+                                ? imageError.message
+                                : String(imageError)
+                        )
+                    );
+
+                } finally {
+
+                    /*
+                      Release references before processing
+                      the next image.
+                    */
+
+                    image = null;
+                    jpegBytes = null;
+
+                    try {
+                        if (
+                            global.gc &&
+                            imageIndex % 10 === 0
+                        ) {
+                            global.gc();
+                        }
+                    } catch (error) {}
+
+                }
 
             }
 
@@ -574,7 +829,7 @@ app.use(
                 success: false,
 
                 message:
-                    "Maximum 20 images are allowed."
+                    "Maximum 45 images are allowed."
 
             });
 
@@ -695,3 +950,7 @@ app.listen(
 
 
 
+
+
+// PDF_MAKER_KEEP_ALIVE
+setInterval(function () {}, 1000);

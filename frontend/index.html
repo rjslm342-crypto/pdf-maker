@@ -7,6 +7,10 @@
 
 <!-- PDF engine -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<script src="/fonts/regenerator-runtime.js"></script>
+<script src="/fonts/fontkit.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script>
 function openWhyWebsite(){
   const modal = document.createElement("div");
@@ -1255,23 +1259,16 @@ footer{
    IMAGE -> PDF PROGRESS STEPPER
    ========================================================= */
 
-.image-pdf-progress{
-  position:fixed;
-  inset:0;
-  z-index:99999;
-  display:flex;
-  align-items:flex-end;
+.image-selection-progress{position:fixed;inset:0;z-index:99998;display:none;align-items:center;justify-content:center;padding:20px;box-sizing:border-box;background:rgba(0,0,0,.58);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.image-selection-progress-box{width:min(390px,calc(100vw - 32px));box-sizing:border-box;padding:22px;border-radius:22px;background:linear-gradient(145deg,#171717,#252525);color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.55),0 0 30px rgba(174,255,254,.18);border:1px solid rgba(174,255,254,.28);animation:imageSelectionPopupIn .3s cubic-bezier(.16,1,.3,1)}@keyframes imageSelectionPopupIn{from{opacity:0;transform:translateY(25px) scale(.9)}to{opacity:1;transform:translateY(0) scale(1)}}.image-selection-progress-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}.image-selection-progress-title{font-size:18px;font-weight:800}.image-selection-progress-count{font-size:16px;font-weight:900;color:#AEFFFE}.image-selection-progress-bar{position:relative;width:100%;height:10px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.13);box-shadow:inset 0 1px 3px rgba(0,0,0,.3)}.image-selection-progress-fill{position:relative;width:0%;height:100%;border-radius:999px;background:linear-gradient(90deg,#AEFFFE,#fff,#AEFFFE);box-shadow:0 0 10px rgba(174,255,254,.8);transition:width .25s ease}.image-selection-progress-fill::after{content:"";position:absolute;top:0;left:-40%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);animation:imageSelectionShimmer 1s linear infinite}@keyframes imageSelectionShimmer{from{left:-40%}to{left:110%}}.image-selection-progress-text{margin-top:10px;font-size:13px;color:rgba(255,255,255,.78)}\n.image-pdf-progress{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;
   justify-content:center;
   padding:20px 12px;
   box-sizing:border-box;
   pointer-events:auto;
-  background:rgba(0,0,0,.62);
-  backdrop-filter:blur(7px);
+  background:linear-gradient(135deg,rgba(0,38,110,.94),rgba(0,92,180,.88),rgba(0,24,72,.96));backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(7px);
 }
 
-.image-pdf-progress-box{
-  position:fixed;
+.image-pdf-progress-box{position:relative;
   width:min(430px,calc(100vw - 24px));
   max-height:calc(100vh - 40px);
   overflow:auto;
@@ -1287,11 +1284,7 @@ footer{
   animation:imagePDFPopupIn .32s cubic-bezier(.16,1,.3,1);
 }
 
-@keyframes imagePDFPopupIn{
-  from{
-    opacity:0;
-    transform:translateX(-50%) translateY(22px) scale(.94);
-  }
+@keyframes imagePDFBeam{from{left:-55%}to{left:125%}}\n@keyframes imagePDFStrongProgress{0%{background-position:0% 50%;filter:brightness(1)}50%{background-position:100% 50%;filter:brightness(1.45)}100%{background-position:0% 50%;filter:brightness(1)}}\n@keyframes imagePDFPopupIn{from{opacity:0;transform:translateY(35px) scale(.88);}60%{opacity:1;transform:translateY(-5px) scale(1.02);}to{opacity:1;transform:translateY(0) scale(1);}}
   to{
     opacity:1;
     transform:translateX(-50%) translateY(0) scale(1);
@@ -1331,49 +1324,11 @@ footer{
   visibility:visible;
 }
 
-.image-pdf-progress-bar{
-  position:relative;
-  width:100%;
-  height:11px;
-  overflow:hidden;
-  border-radius:999px;
-  background:rgba(174,255,254,.16);
-  margin-bottom:20px;
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.16);
-}
+.image-pdf-progress-bar{position:relative;width:100%;height:14px;overflow:hidden;border-radius:999px;background:rgba(255,255,255,.18);margin-bottom:20px;box-shadow:inset 0 1px 4px rgba(0,0,0,.3),0 0 14px rgba(174,255,254,.18)}
 
-#imagePDFProgressFill{
-  position:relative;
-  width:0%;
-  height:100%;
-  overflow:hidden;
-  border-radius:999px;
-  background:linear-gradient(
-    90deg,
-    #AEFFFE,
-    #ffffff,
-    #AEFFFE
-  );
-  box-shadow:
-    0 0 9px rgba(174,255,254,.85),
-    0 0 20px rgba(174,255,254,.32);
-  transition:width .65s cubic-bezier(.16,1,.3,1);
-}
+#imagePDFProgressFill{position:relative;width:0%;height:100%;overflow:hidden;border-radius:999px;background:linear-gradient(90deg,#AEFFFE,#fff,#AEFFFE,#fff,#AEFFFE);background-size:300% 100%;box-shadow:0 0 12px rgba(174,255,254,1),0 0 28px rgba(174,255,254,.75),0 0 50px rgba(80,180,255,.45);transition:width .65s cubic-bezier(.16,1,.3,1);animation:imagePDFStrongProgress 1.15s linear infinite}
 
-#imagePDFProgressFill::after{
-  content:"";
-  position:absolute;
-  top:0;
-  left:-45%;
-  width:45%;
-  height:100%;
-  background:linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,.9),
-    transparent
-  );
-  animation:imagePDFBarShine 1.15s linear infinite;
+#imagePDFProgressFill::after{content:"";position:absolute;top:-30%;left:-55%;width:45%;height:160%;transform:skewX(-18deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,1),rgba(255,255,255,.35),transparent);filter:blur(1px);animation:imagePDFBeam 1.05s linear infinite;
 }
 
 @keyframes imagePDFBarShine{
@@ -1534,7 +1489,7 @@ footer{
   .image-pdf-progress-actions{
     margin-top:15px;
   }
-}\n</style>
+}\n\n</style>
 
 <style id="saved-documents-button-color">
 .feature[onclick="openTool('saved-documents')"]{
@@ -1556,6 +1511,63 @@ footer{
 }
 </style>
 
+<style id="pdf-maker-final-progress-fix">.image-selection-progress,.image-pdf-progress{position:fixed!important;inset:0!important;width:100vw!important;height:100vh!important;align-items:center!important;justify-content:center!important;padding:20px!important;box-sizing:border-box!important}.image-selection-progress-box,.image-pdf-progress-box{position:relative!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;margin:0!important}.image-selection-progress-box{animation:selectionCenterIn .55s cubic-bezier(.16,1,.3,1)!important}.image-pdf-progress-box{animation:pdfCenterIn .55s cubic-bezier(.16,1,.3,1)!important}.image-pdf-progress-bar{height:16px!important;background:rgba(255,255,255,.14)!important;box-shadow:inset 0 2px 5px rgba(0,0,0,.35),0 0 18px rgba(174,255,254,.3)!important}.image-pdf-progress-bar #imagePDFProgressFill{background:linear-gradient(90deg,#AEFFFE,#fff,#AEFFFE,#fff,#AEFFFE)!important;background-size:300% 100%!important;animation:selectionBarFlow .8s linear infinite,selectionBarGlow .9s ease-in-out infinite alternate!important;box-shadow:0 0 12px #AEFFFE,0 0 25px rgba(174,255,254,.8)!important}.image-selection-progress-fill{background:linear-gradient(90deg,#AEFFFE,#fff,#AEFFFE,#fff,#AEFFFE)!important;background-size:300% 100%!important;animation:selectionBarFlow .8s linear infinite,selectionBarGlow .9s ease-in-out infinite alternate!important;box-shadow:0 0 12px #AEFFFE,0 0 25px rgba(174,255,254,.8)!important}@keyframes pdfBarFlow{from{background-position:0% 50%}to{background-position:250% 50%}}@keyframes pdfBarGlow{from{filter:brightness(1);box-shadow:0 0 10px #AEFFFE,0 0 25px rgba(174,255,254,.8)}to{filter:brightness(1.6);box-shadow:0 0 18px #fff,0 0 38px rgba(174,255,254,1),0 0 65px rgba(80,180,255,.8)}}@keyframes pdfBarBeam{from{left:-35%}to{left:115%}}@keyframes selectionBarFlow{from{background-position:0% 50%}to{background-position:300% 50%}}@keyframes selectionBarGlow{from{filter:brightness(1)}to{filter:brightness(1.45)}}@keyframes pdfCenterIn{0%{opacity:0;transform:scale(.72)}55%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}@keyframes selectionCenterIn{0%{opacity:0;transform:scale(.78)}55%{opacity:1;transform:scale(1.05)}100%{opacity:1;transform:scale(1)}}</style>
+
+<script>
+/* PDF_MAKER_UNICODE_FONT_HELPERS
+   Loads the embedded Noto fonts used for Hindi, Bengali and Assamese
+   when the Text -> PDF renderer switches to pdf-lib + fontkit.
+*/
+window.pdfMakerUnicodeFonts = window.pdfMakerUnicodeFonts || {
+  devanagari: "/fonts/NotoSansDevanagari-Regular.ttf",
+  bengali: "/fonts/NotoSansBengali-Regular.ttf"
+};
+</script>
+
+<script>
+/* PDF_MAKER_UNICODE_FONT_LOADER
+   Loads each Unicode font once and keeps the bytes in memory
+   for the client-side Text -> PDF renderer.
+*/
+window.pdfMakerUnicodeFontBytes = window.pdfMakerUnicodeFontBytes || {
+  devanagari: null,
+  bengali: null
+};
+
+window.loadPDFMakerUnicodeFonts = async function(){
+  if(
+    window.pdfMakerUnicodeFontBytes.devanagari &&
+    window.pdfMakerUnicodeFontBytes.bengali
+  ){
+    return window.pdfMakerUnicodeFontBytes;
+  }
+
+  const fonts = window.pdfMakerUnicodeFonts;
+
+  const [devanagariResponse,bengaliResponse] = await Promise.all([
+    fetch(fonts.devanagari),
+    fetch(fonts.bengali)
+  ]);
+
+  if(!devanagariResponse.ok){
+    throw new Error("Could not load Noto Sans Devanagari font.");
+  }
+
+  if(!bengaliResponse.ok){
+    throw new Error("Could not load Noto Sans Bengali font.");
+  }
+
+  const [devanagariBytes,bengaliBytes] = await Promise.all([
+    devanagariResponse.arrayBuffer(),
+    bengaliResponse.arrayBuffer()
+  ]);
+
+  window.pdfMakerUnicodeFontBytes.devanagari = new Uint8Array(devanagariBytes);
+  window.pdfMakerUnicodeFontBytes.bengali = new Uint8Array(bengaliBytes);
+
+  return window.pdfMakerUnicodeFontBytes;
+};
+</script>
 </head>
 
 <body>
@@ -1675,7 +1687,7 @@ Choose Images
 </button>
 </label>
 
-<input id="imageInput" type="file" accept="image/jpeg,image/png" multiple>
+<input id="imageInput" type="file" accept="image/*" multiple>
 
 <div id="imageFileList" class="file-list"></div>
 
@@ -1688,15 +1700,17 @@ Choose Images
 <option value="A5">A5</option>
 <option value="Letter">Letter</option>
 <option value="Legal">Legal</option>
+<option value="original">Original Size</option>
 </select>
 </div>
 
 <div class="field">
 <label>Orientation</label>
 <select id="imageOrientation">
-                    <option value="portrait">Portrait</option>
-                    <option value="landscape" selected>Landscape</option>
-                  </select>
+<option value="auto" selected>Auto</option>
+<option value="portrait">Portrait</option>
+<option value="landscape">Landscape</option>
+</select>
 </div>
 
 <div class="field">
@@ -1721,7 +1735,7 @@ Clear
 </button>
 </div>
 
-<div id="imageStatus" class="status"></div>
+<div id="imageStatus" class="status"></div>\n<div id="imageSelectionProgress" class="image-selection-progress"><div class="image-selection-progress-box"><div class="image-selection-progress-head"><div class="image-selection-progress-title">Loading images...</div><div id="imageSelectionProgressCount" class="image-selection-progress-count">0 / 0</div></div><div class="image-selection-progress-bar"><div id="imageSelectionProgressFill" class="image-selection-progress-fill"></div></div><div id="imageSelectionProgressText" class="image-selection-progress-text">Preparing selected images...</div></div></div>
 <div id="imagePDFProgress" class="image-pdf-progress" style="display:none">
   <div class="image-pdf-progress-box">
 
@@ -2398,6 +2412,7 @@ Built for students, businesses and everyday PDF needs.
 const API_URL = "https://pdf-maker-66o3.onrender.com";
 
 let selectedFiles = [];
+const clientPDFByteCache = new WeakMap();
 let lastPDFBlob = null;
 let lastPDFURL = null;
 
@@ -2457,29 +2472,58 @@ document.addEventListener("DOMContentLoaded", function(){
 
 const imageInput=document.getElementById("imageInput");
 
-imageInput.addEventListener("change",function(){
-
-  const MAX_IMAGES=45;
-  const files=Array.from(this.files); const limitReached=selectedFiles.length + files.length > MAX_IMAGES;
-
-  files.forEach(file=>{
-
-    if(
-      file.type==="image/jpeg" ||
-      file.type==="image/png"
-    ){
-      if(selectedFiles.length < MAX_IMAGES){ selectedFiles.push(file); }
-    }
-
+imageInput.addEventListener("change",async function(){
+  const MAX_IMAGES=150;
+  const files=Array.from(this.files);
+  const limitReached=selectedFiles.length + files.length > MAX_IMAGES;
+  const progressModal=document.getElementById("imageSelectionProgress");
+  const progressFill=document.getElementById("imageSelectionProgressFill");
+  const progressCount=document.getElementById("imageSelectionProgressCount");
+  const progressText=document.getElementById("imageSelectionProgressText");
+  const validFiles=files.filter(function(file){
+    return file.type.startsWith("image/") || /\.(jpe?g|png|webp|avif|heic|heif|bmp|svg)$/i.test(file.name||"");
   });
+  let loadedCount=0;
 
-  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
+  if(validFiles.length && progressModal){
+    if(progressModal && progressModal.parentElement !== document.body){
+      document.body.appendChild(progressModal);
+    }
+    progressModal.style.display="flex";
+    if(progressFill) progressFill.style.width="0%";
+    if(progressCount) progressCount.textContent="0 / "+validFiles.length;
+    if(progressText) progressText.textContent="Reading images from your device...";
+  }
+
+  for(const file of files){
+    if(file.type.startsWith("image/") || /\.(jpe?g|png|webp|avif|heic|heif|bmp|svg)$/i.test(file.name||"")){
+      if(selectedFiles.length < MAX_IMAGES){
+        const buffer=await file.arrayBuffer();
+        clientPDFByteCache.set(file,buffer);
+        selectedFiles.push(file);
+        loadedCount++;
+        if(progressFill) progressFill.style.width=Math.round((loadedCount/validFiles.length)*100)+"%";
+        if(progressCount) progressCount.textContent=loadedCount+" / "+validFiles.length;
+        if(progressText) progressText.textContent="Loading image "+loadedCount+" of "+validFiles.length+"...";
+      }
+    }
+  }
+
+  if(limitReached){
+    alert("Currently, you can add up to 150 images per PDF.");
+  }
 
   renderImages();
-  imageInput.value="";
+
+  if(progressModal){
+    if(progressFill) progressFill.style.width="100%";
+    if(progressCount) progressCount.textContent=validFiles.length+" / "+validFiles.length;
+    if(progressText) progressText.textContent="Images ready ✓";
+    setTimeout(function(){progressModal.style.display="none";},350);
+  }
+
+  // imageInput.value="";
 });
-
-
 function renderImages(){
 
   const list =
@@ -2691,7 +2735,6 @@ function formatBytes(bytes){
 function removeImage(index){
 
   selectedFiles.splice(index,1);
-  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
 
   renderImages();
 }
@@ -2718,7 +2761,6 @@ function moveImage(index,direction){
 function clearImages(){
 
   selectedFiles=[];
-  if(limitReached){ alert("Currently, you can add up to 45 images per PDF. This limit may be increased in the future based on system capacity and user requirements."); }
 
   renderImages();
 
@@ -3258,180 +3300,413 @@ document
 
 
 async function prepareImageForPDF(file){
-  if(!file||!file.type.startsWith("image/"))return file;
+  if(!file||!file.type.startsWith("image/")){
+    return {file:file,processed:false};
+  }
+
   const MAX_DIMENSION=1800;
   const JPEG_QUALITY=0.82;
+
   return new Promise(function(resolve){
+    let finished=false;
+
+    function fallback(reason){
+      if(finished)return;
+      finished=true;
+      if(reason)console.warn("Image optimization skipped:",reason);
+      resolve({file:file,processed:false});
+    }
+
     const url=URL.createObjectURL(file);
     const img=new Image();
+
     img.onload=function(){
       try{
         const width=img.naturalWidth||img.width;
         const height=img.naturalHeight||img.height;
-        if(!width||!height){URL.revokeObjectURL(url);resolve(file);return;}
+
+        if(!width||!height){
+          URL.revokeObjectURL(url);
+          fallback("Invalid image dimensions");
+          return;
+        }
+
         const scale=Math.min(1,MAX_DIMENSION/Math.max(width,height));
         const targetWidth=Math.max(1,Math.round(width*scale));
         const targetHeight=Math.max(1,Math.round(height*scale));
         const canvas=document.createElement("canvas");
-        canvas.width=targetWidth;canvas.height=targetHeight;
+        canvas.width=targetWidth;
+        canvas.height=targetHeight;
         const ctx=canvas.getContext("2d");
-        if(!ctx){URL.revokeObjectURL(url);resolve(file);return;}
+
+        if(!ctx){
+          URL.revokeObjectURL(url);
+          fallback("Canvas context unavailable");
+          return;
+        }
+
         ctx.drawImage(img,0,0,targetWidth,targetHeight);
+
         canvas.toBlob(function(blob){
           URL.revokeObjectURL(url);
-          if(!blob){resolve(file);return;}
-          const optimizedFile=new File([blob],file.name.replace(/\\.[^.]+$/,"")+".jpg",{type:"image/jpeg",lastModified:Date.now()});
-          resolve(optimizedFile.size<file.size?optimizedFile:file);
+
+          if(!blob){
+            fallback("JPEG conversion failed");
+            return;
+          }
+
+          try{
+            const optimizedFile=new File(
+              [blob],
+              file.name.replace(/\.[^.]+$/,"")+".jpg",
+              {type:"image/jpeg",lastModified:Date.now()}
+            );
+
+            finished=true;
+            resolve({file:optimizedFile,processed:true});
+          }catch(error){
+            fallback(error);
+          }
         },"image/jpeg",JPEG_QUALITY);
-      }catch(error){URL.revokeObjectURL(url);console.warn("Image optimization skipped:",error);resolve(file);}
+
+      }catch(error){
+        URL.revokeObjectURL(url);
+        fallback(error);
+      }
     };
-    img.onerror=function(){URL.revokeObjectURL(url);resolve(file);};
+
+    img.onerror=function(){
+      URL.revokeObjectURL(url);
+      fallback("Browser could not decode image");
+    };
+
     img.src=url;
   });
 }
 
 async function createImagesPDF(){
-  if(selectedFiles.length===0)
-    return;
+  if(selectedFiles.length===0) return;
 
-  const status =
-    document.getElementById("imageStatus");
+  const status=document.getElementById("imageStatus");
+  const total=selectedFiles.length;
+  const pageSize=document.getElementById("imagePageSize").value;
+  const orientationSetting=document.getElementById("imageOrientation").value;
 
-  const total =
-    selectedFiles.length;
+  let marginMM=Number(
+    document.getElementById("imageMargin").value
+  );
 
-  const pageSize =
-    document.getElementById("imagePageSize").value;
+  if(!Number.isFinite(marginMM)) marginMM=2;
 
-  const orientation =
-    document.getElementById("imageOrientation").value;
+  marginMM=Math.max(0,Math.min(50,marginMM));
 
-  let margin =
-    Number(document.getElementById("imageMargin").value);
+  /*
+   * The UI accepts millimetres.
+   * PDF coordinates use points, so convert mm -> pt.
+   */
+  const margin=marginMM*2.8346456693;
 
-  if(!Number.isFinite(margin))
-    margin = 2;
-
-  margin = Math.max(0, Math.min(50, margin));
-
-  const filenameInput =
+  const filenameInput=
     document.getElementById("imageFilename").value.trim();
 
-  const filename =
-    filenameInput || "document.pdf";
+  const filename=
+    filenameInput||"document.pdf";
 
-  status.style.display = "block";
+  status.style.display="block";
 
-  imagePDFAbortController = new AbortController();
-  imagePDFCancelled = false;
+  imagePDFAbortController=new AbortController();
+  imagePDFCancelled=false;
 
   showImagePDFProgress();
 
-  updateImagePDFProgress(
-    1,
-    5,
-    "Preparing images..."
-  );
-
   try{
-    const formData = new FormData();
+    updateImagePDFProgress(
+      1,
+      3,
+      "Preparing PDF engine..."
+    );
 
-    for(let i=0;i<selectedFiles.length;i++){
-      const preparePercent =
-        5 + Math.round(((i + 1) / total) * 15);
+    if(
+      typeof PDFLib==="undefined"||
+      !PDFLib.PDFDocument
+    ){
+      throw new Error(
+        "PDF engine could not be loaded. Please refresh the page and try again."
+      );
+    }
 
-      status.textContent =
-        "Optimizing images... " +
-        (i + 1) +
-        " / " +
-        total;
+    const pdfDoc=
+      await PDFLib.PDFDocument.create();
+
+    for(let i=0;i<total;i++){
+
+      if(imagePDFCancelled){
+        throw new DOMException(
+          "The PDF generation request was cancelled.",
+          "AbortError"
+        );
+      }
+
+      const progress=
+        5+Math.round(((i+1)/total)*88);
+
+      status.textContent=
+        "Processing image "+(i+1)+" / "+total;
 
       updateImagePDFProgress(
-        1,
-        preparePercent,
-        "Optimizing image " +
-        (i + 1) +
-        " of " +
-        total
+        2,
+        progress,
+        "Processing image "+(i+1)+" of "+total
       );
 
-      const optimizedFile =
-        await prepareImageForPDF(
+      /*
+       * Normalize only when required.
+       * Standard JPEG/PNG files can keep their original bytes.
+       */
+      const prepared=
+        await prepareClientPDFImage(
           selectedFiles[i]
         );
 
-      formData.append(
-        "images",
-        optimizedFile,
-        optimizedFile.name
-      );
-    }
+      if(imagePDFCancelled){
+        if(prepared.cleanup){
+          prepared.cleanup();
+        }
 
-    formData.append("pageSize", pageSize);
-    formData.append("orientation", orientation);
-    formData.append("margin", String(margin));
+        throw new DOMException(
+          "The PDF generation request was cancelled.",
+          "AbortError"
+        );
+      }
 
-    updateImagePDFProgress(
-      2,
-      25,
-      "Uploading images to server..."
-    );
+      let embeddedImage;
 
-    status.textContent =
-      "Uploading images to server...";
+      if(prepared.kind==="jpg"){
+        embeddedImage=
+          await pdfDoc.embedJpg(
+            prepared.bytes
+          );
+      }else{
+        embeddedImage=
+          await pdfDoc.embedPng(
+            prepared.bytes
+          );
+      }
 
-    const response =
-      await fetch(
-        API_URL + "/api/pdf/images",
+      const sourceWidth=prepared.width;
+      const sourceHeight=prepared.height;
+
+      let pageWidth;
+      let pageHeight;
+
+      if(pageSize==="original"){
+
+        /*
+         * Original Size means one source pixel becomes
+         * one PDF point. No cropping and no padding.
+         */
+        pageWidth=sourceWidth;
+        pageHeight=sourceHeight;
+
+      }else{
+
+        const sizes={
+          A4:{
+            width:595.28,
+            height:841.89
+          },
+          A5:{
+            width:419.53,
+            height:595.28
+          },
+          Letter:{
+            width:612,
+            height:792
+          },
+          Legal:{
+            width:612,
+            height:1008
+          }
+        };
+
+        const selectedSize=
+          sizes[pageSize]||sizes.A4;
+
+        if(
+          orientationSetting==="portrait"
+        ){
+          pageWidth=
+            Math.min(
+              selectedSize.width,
+              selectedSize.height
+            );
+
+          pageHeight=
+            Math.max(
+              selectedSize.width,
+              selectedSize.height
+            );
+
+        }else if(
+          orientationSetting==="landscape"
+        ){
+          pageWidth=
+            Math.max(
+              selectedSize.width,
+              selectedSize.height
+            );
+
+          pageHeight=
+            Math.min(
+              selectedSize.width,
+              selectedSize.height
+            );
+
+        }else{
+
+          /*
+           * Auto orientation follows the image's
+           * natural aspect ratio.
+           */
+          if(sourceWidth>=sourceHeight){
+
+            pageWidth=
+              Math.max(
+                selectedSize.width,
+                selectedSize.height
+              );
+
+            pageHeight=
+              Math.min(
+                selectedSize.width,
+                selectedSize.height
+              );
+
+          }else{
+
+            pageWidth=
+              Math.min(
+                selectedSize.width,
+                selectedSize.height
+              );
+
+            pageHeight=
+              Math.max(
+                selectedSize.width,
+                selectedSize.height
+              );
+          }
+        }
+      }
+
+      const page=
+        pdfDoc.addPage([
+          pageWidth,
+          pageHeight
+        ]);
+
+      let drawWidth;
+      let drawHeight;
+
+      if(pageSize==="original"){
+
+        /*
+         * Exact source dimensions.
+         * No margin, crop or padding.
+         */
+        drawWidth=sourceWidth;
+        drawHeight=sourceHeight;
+
+      }else{
+
+        const availableWidth=
+          Math.max(
+            1,
+            pageWidth-margin*2
+          );
+
+        const availableHeight=
+          Math.max(
+            1,
+            pageHeight-margin*2
+          );
+
+        /*
+         * Aspect ratio is locked.
+         * The complete image always remains visible.
+         */
+        const scale=
+          Math.min(
+            availableWidth/sourceWidth,
+            availableHeight/sourceHeight
+          );
+
+        drawWidth=
+          sourceWidth*scale;
+
+        drawHeight=
+          sourceHeight*scale;
+      }
+
+      /*
+       * Center the image on the page.
+       */
+      const x=
+        (pageWidth-drawWidth)/2;
+
+      const y=
+        (pageHeight-drawHeight)/2;
+
+      page.drawImage(
+        embeddedImage,
         {
-          method: "POST",
-          body: formData,
-          signal: imagePDFAbortController.signal
+          x:x,
+          y:y,
+          width:drawWidth,
+          height:drawHeight
         }
       );
 
-    if(!response.ok){
-      let errorMessage =
-        "Backend PDF generation failed.";
+      if(prepared.cleanup){
+        prepared.cleanup();
+      }
 
-      try{
-        const errorText =
-          await response.text();
-
-        if(errorText)
-          errorMessage = errorText;
-      }catch(error){}
-
-      throw new Error(errorMessage);
+      /*
+       * Yield back to the browser between images so
+       * thumbnails/UI remain responsive.
+       */
+      await new Promise(function(resolve){
+        requestAnimationFrame(function(){
+          resolve();
+        });
+      });
     }
 
     updateImagePDFProgress(
-      3,
-      55,
-      "Server is creating your PDF..."
-    );
-
-    status.textContent =
-      "PDF is being created by server...";
-
-    const blob =
-      await response.blob();
-
-    if(!blob || blob.size===0)
-      throw new Error(
-        "Server returned an empty PDF."
-      );
-
-    updateImagePDFProgress(
       4,
-      85,
+      94,
       "PDF created. Preparing download..."
     );
 
-    status.textContent =
-      "PDF created by server. Downloading...";
+    const pdfBytes=
+      await pdfDoc.save();
 
-    lastPDFBlob = blob;
+    if(
+      !pdfBytes||
+      pdfBytes.length===0
+    ){
+      throw new Error(
+        "Browser returned an empty PDF."
+      );
+    }
+
+    const blob=
+      new Blob(
+        [pdfBytes],
+        {type:"application/pdf"}
+      );
+
+    lastPDFBlob=blob;
 
     if(lastPDFURL){
       try{
@@ -3439,9 +3714,11 @@ async function createImagesPDF(){
       }catch(error){}
     }
 
-    const imageTitle =
-      filename.replace(/\.pdf$/i, "") ||
-      "Images PDF";
+    const imageTitle=
+      filename.replace(
+        /\.pdf$/i,
+        ""
+      )||"Images PDF";
 
     await savePDFBlobToSavedDocuments(
       blob,
@@ -3451,23 +3728,23 @@ async function createImagesPDF(){
 
     updateImagePDFProgress(
       4,
-      94,
+      98,
       "Starting PDF download..."
     );
 
-    lastPDFURL =
+    lastPDFURL=
       URL.createObjectURL(blob);
 
-    const downloadName =
+    const downloadName=
       filename.toLowerCase().endsWith(".pdf")
         ? filename
-        : filename + ".pdf";
+        : filename+".pdf";
 
-    const a =
+    const a=
       document.createElement("a");
 
-    a.href = lastPDFURL;
-    a.download = downloadName;
+    a.href=lastPDFURL;
+    a.download=downloadName;
 
     document.body.appendChild(a);
     a.click();
@@ -3475,41 +3752,42 @@ async function createImagesPDF(){
 
     document.getElementById(
       "imageResult"
-    ).style.display = "block";
+    ).style.display="block";
 
     completeImagePDFProgress();
 
-    status.textContent =
+    status.textContent=
       "PDF successfully created and downloaded. ✅";
 
     setTimeout(function(){
       hideImagePDFProgress();
-    }, 1200);
+    },1200);
 
   }catch(error){
 
     console.error(
-      "Backend Images → PDF error:",
+      "Client-side Images → PDF error:",
       error
     );
 
     if(
-      error &&
-      error.name === "AbortError"
+      error&&
+      error.name==="AbortError"
     ){
+
       showImagePDFProgressError(
         "The PDF generation request was cancelled.",
         true
       );
 
-      status.textContent =
+      status.textContent=
         "PDF creation cancelled.";
 
       return;
     }
 
-    const errorMessage =
-      error && error.message
+    const errorMessage=
+      error&&error.message
         ? error.message
         : String(error);
 
@@ -3524,10 +3802,445 @@ async function createImagesPDF(){
       false
     );
 
-    status.textContent =
-      "Failed to create the PDF. Error: " +
+    status.textContent=
+      "Failed to create the PDF. Error: "+
       errorMessage;
   }
+}
+
+async function prepareClientPDFImage(file){
+  const name=(file.name||"").toLowerCase();
+  const type=(file.type||"").toLowerCase();
+  const cachedBuffer=await (clientPDFByteCache.get(file)||file.arrayBuffer());
+  const cachedBytes=new Uint8Array(cachedBuffer);
+  const sourceBlob=new Blob([cachedBytes],{type:type||"application/octet-stream"});
+
+  if(
+    type==="image/heic"||
+    type==="image/heif"||
+    /\.hei[cf]$/i.test(name)
+  ){
+    if(typeof heic2any!=="function"){
+      throw new Error("HEIC/HEIF support is unavailable.");
+    }
+
+    const converted=await heic2any({
+      blob:file,
+      toType:"image/jpeg",
+      quality:0.92
+    });
+
+    const blob=Array.isArray(converted)
+      ? converted[0]
+      : converted;
+
+    return normalizeClientImageBlob(new Blob([new Uint8Array(await blob.arrayBuffer())],{type:"image/jpeg"}),"image/jpeg");
+  }
+
+  if(
+    type==="image/jpeg"||
+    type==="image/jpg"||
+    /\.jpe?g$/i.test(name)
+  ){
+    const orientation=
+      readJPEGExifOrientation(cachedBytes);
+
+    if(orientation===1){
+      const bytes=
+        cachedBytes;
+
+      const dimensions=
+        readJPEGDimensions(bytes);
+
+      if(!dimensions.width||!dimensions.height){
+        return normalizeClientImageBlob(sourceBlob,"image/jpeg");
+      }
+
+      return {
+        bytes:bytes,
+        kind:"jpg",
+        width:dimensions.width,
+        height:dimensions.height,
+        cleanup:null
+      };
+    }
+
+    return normalizeClientImageBlob(
+      sourceBlob,
+      "image/jpeg"
+    );
+  }
+
+  if(
+    type==="image/png"||
+    /\.png$/i.test(name)
+  ){
+    const bytes=
+      cachedBytes;
+
+    const dimensions=
+      readPNGDimensions(bytes);
+
+    if(!dimensions.width||!dimensions.height){ return normalizeClientImageBlob(sourceBlob,"image/png"); }
+
+    return {
+      bytes:bytes,
+      kind:"png",
+      width:dimensions.width,
+      height:dimensions.height,
+      cleanup:null
+    };
+  }
+
+  return normalizeClientImageBlob(
+    sourceBlob,
+    type||"image/png"
+  );
+}
+
+async function normalizeClientImageBlob(blob,type){
+  const url=URL.createObjectURL(blob);
+
+  try{
+    const img=await loadClientImage(url);
+
+    const width=
+      img.naturalWidth||img.width;
+
+    const height=
+      img.naturalHeight||img.height;
+
+    if(!width||!height){
+      throw new Error(
+        "Could not determine image dimensions."
+      );
+    }
+
+    const canvas=
+      document.createElement("canvas");
+
+    canvas.width=width;
+    canvas.height=height;
+
+    const ctx=
+      canvas.getContext("2d");
+
+    if(!ctx){
+      throw new Error(
+        "Canvas is unavailable in this browser."
+      );
+    }
+
+    /*
+     * Browser decoding handles the source format.
+     * Drawing to canvas produces a normalized PNG
+     * byte stream suitable for pdf-lib.
+     */
+    ctx.drawImage(
+      img,
+      0,
+      0,
+      width,
+      height
+    );
+
+    const normalizedBlob=
+      await new Promise(function(resolve,reject){
+        canvas.toBlob(
+          function(result){
+            if(!result){
+              reject(
+                new Error(
+                  "Image normalization failed."
+                )
+              );
+              return;
+            }
+
+            resolve(result);
+          },
+          "image/png"
+        );
+      });
+
+    const bytes=
+      new Uint8Array(
+        await normalizedBlob.arrayBuffer()
+      );
+
+    return {
+      bytes:bytes,
+      kind:"png",
+      width:width,
+      height:height,
+      cleanup:function(){
+        canvas.width=1;
+        canvas.height=1;
+      }
+    };
+
+  }finally{
+    URL.revokeObjectURL(url);
+  }
+}
+
+function loadClientImage(url){
+  return new Promise(function(resolve,reject){
+    const img=new Image();
+
+    img.onload=function(){
+      resolve(img);
+    };
+
+    img.onerror=function(){
+      reject(
+        new Error(
+          "Browser could not decode this image."
+        )
+      );
+    };
+
+    img.src=url;
+  });
+}
+
+function readPNGDimensions(bytes){
+  if(
+    bytes.length<24||
+    bytes[0]!==0x89||
+    bytes[1]!==0x50||
+    bytes[2]!==0x4E||
+    bytes[3]!==0x47||
+    bytes[4]!==0x0D||
+    bytes[5]!==0x0A||
+    bytes[6]!==0x1A||
+    bytes[7]!==0x0A
+  ){
+    return {width:0,height:0};
+  }
+
+  const view=new DataView(
+    bytes.buffer,
+    bytes.byteOffset,
+    bytes.byteLength
+  );
+
+  return {
+    width:view.getUint32(16,false),
+    height:view.getUint32(20,false)
+  };
+}
+
+function readJPEGDimensions(bytes){
+  if(
+    bytes.length<4||
+    bytes[0]!==0xFF||
+    bytes[1]!==0xD8
+  ){
+    return {width:0,height:0};
+  }
+
+  let offset=2;
+
+  while(offset+4<bytes.length){
+
+    if(bytes[offset]!==0xFF){
+      offset++;
+      continue;
+    }
+
+    let marker=bytes[offset+1];
+
+    while(
+      marker===0xFF&&
+      offset+2<bytes.length
+    ){
+      offset++;
+      marker=bytes[offset+1];
+    }
+
+    if(marker===0xD8||marker===0xD9){
+      offset+=2;
+      continue;
+    }
+
+    if(marker===0xDA){
+      break;
+    }
+
+    if(offset+4>bytes.length){
+      break;
+    }
+
+    const segmentLength=
+      (bytes[offset+2]<<8)|
+      bytes[offset+3];
+
+    if(
+      segmentLength<2||
+      offset+2+segmentLength>bytes.length
+    ){
+      break;
+    }
+
+    const isSOF=
+      (marker>=0xC0&&marker<=0xC3)||
+      (marker>=0xC5&&marker<=0xC7)||
+      (marker>=0xC9&&marker<=0xCB)||
+      (marker>=0xCD&&marker<=0xCF);
+
+    if(isSOF){
+      const height=
+        (bytes[offset+5]<<8)|
+        bytes[offset+6];
+
+      const width=
+        (bytes[offset+7]<<8)|
+        bytes[offset+8];
+
+      return {
+        width:width,
+        height:height
+      };
+    }
+
+    offset+=2+segmentLength;
+  }
+
+  return {width:0,height:0};
+}
+
+function readJPEGExifOrientation(bytes){
+  try{
+    const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
+
+    if(
+      view.byteLength<4||
+      view.getUint16(0,false)!==0xFFD8
+    ){
+      return 1;
+    }
+
+    let offset=2;
+
+    while(offset+4<=view.byteLength){
+
+      if(view.getUint8(offset)!==0xFF){
+        offset++;
+        continue;
+      }
+
+      const marker=
+        view.getUint8(offset+1);
+
+      offset+=2;
+
+      if(marker===0xD9||marker===0xDA){
+        break;
+      }
+
+      if(offset+2>view.byteLength){
+        break;
+      }
+
+      const segmentLength=
+        view.getUint16(offset,false);
+
+      if(
+        segmentLength<2||
+        offset+segmentLength>view.byteLength
+      ){
+        break;
+      }
+
+      if(
+        marker===0xE1&&
+        segmentLength>=8
+      ){
+        const exifStart=offset+2;
+
+        if(
+          view.getUint8(exifStart)===0x45&&
+          view.getUint8(exifStart+1)===0x78&&
+          view.getUint8(exifStart+2)===0x69&&
+          view.getUint8(exifStart+3)===0x66
+        ){
+          const tiff=exifStart+6;
+
+          const little=
+            view.getUint16(tiff,false)===0x4949;
+
+          const get16=
+            function(p){
+              return view.getUint16(p,little);
+            };
+
+          const get32=
+            function(p){
+              return view.getUint32(p,little);
+            };
+
+          if(get16(tiff+2)!==0x002A){
+            return 1;
+          }
+
+          const ifdOffset=
+            get32(tiff+4);
+
+          const ifd=
+            tiff+ifdOffset;
+
+          if(ifd+2>view.byteLength){
+            return 1;
+          }
+
+          const count=get16(ifd);
+
+          for(let i=0;i<count;i++){
+
+            const entry=
+              ifd+2+i*12;
+
+            if(entry+12>view.byteLength){
+              break;
+            }
+
+            if(get16(entry)===0x0112){
+
+              const valueType=
+                get16(entry+2);
+
+              const valueCount=
+                get32(entry+4);
+
+              if(
+                valueType===3&&
+                valueCount===1
+              ){
+                const orientation=
+                  get16(entry+8);
+
+                return orientation>=1&&
+                  orientation<=8
+                    ? orientation
+                    : 1;
+              }
+            }
+          }
+        }
+      }
+
+      offset+=segmentLength;
+    }
+
+  }catch(error){
+    console.warn(
+      "EXIF orientation read skipped:",
+      error
+    );
+  }
+
+  return 1;
 }
 
 const editor = document.getElementById("editorContent");
@@ -5477,1156 +6190,698 @@ function downloadTextPDF(){
 async function createTextPDF(){
   if(!validateHeadingBeforePDF()) return;
 
-  const status =
-    document.getElementById("textStatus");
+  const status=document.getElementById("textStatus");
 
   try{
-
     if(!savedTextDocument){
-
-      status.style.display = "block";
-
-      status.textContent =
-        "Please save your document first.";
-
+      status.style.display="block";
+      status.textContent="Please save your document first.";
       return;
     }
-
-    if(typeof window.jspdf === "undefined"){
-
-      status.style.display = "block";
-
-      status.textContent =
-        "PDF engine is not available.";
-
-      return;
-    }
-
-    const jsPDF =
-      window.jspdf.jsPDF;
-
-
-    /* PAGE SIZES IN PDF POINTS */
-
-    const sizes = {
-
-      A4: {
-        width: 595,
-        height: 842
-      },
-
-      A5: {
-        width: 420,
-        height: 595
-      },
-
-      Letter: {
-        width: 612,
-        height: 792
-      },
-
-      Legal: {
-        width: 612,
-        height: 1008
-      }
-    };
-
-
-    const selectedSize =
-      savedTextDocument.pageSize || "A4";
-
-    let page =
-      sizes[selectedSize] || sizes.A4;
-
-    let pageWidth =
-      page.width;
-
-    let pageHeight =
-      page.height;
-
 
     if(
-      savedTextDocument.orientation ===
-      "landscape"
+      typeof window.PDFLib==="undefined" ||
+      typeof window.fontkit==="undefined"
     ){
-
-      const temp =
-        pageWidth;
-
-      pageWidth =
-        pageHeight;
-
-      pageHeight =
-        temp;
+      status.style.display="block";
+      status.textContent="Unicode PDF engine is not available.";
+      return;
     }
 
+    const PDFDocument=window.PDFLib.PDFDocument;
+    const StandardFonts=window.PDFLib.StandardFonts;
 
-    const pdf =
-      new jsPDF({
+    const sizes={
+      A4:{width:595.28,height:841.89},
+      A5:{width:419.53,height:595.28},
+      Letter:{width:612,height:792},
+      Legal:{width:612,height:1008}
+    };
 
-        orientation:
-          pageWidth > pageHeight
-            ? "landscape"
-            : "portrait",
+    const selectedSize=savedTextDocument.pageSize||"A4";
+    let pageSize=sizes[selectedSize]||sizes.A4;
 
-        unit:
-          "pt",
+    let pageWidth=pageSize.width;
+    let pageHeight=pageSize.height;
 
-        format: [
-          pageWidth,
-          pageHeight
-        ],
+    if(savedTextDocument.orientation==="landscape"){
+      const temp=pageWidth;
+      pageWidth=pageHeight;
+      pageHeight=temp;
+    }
 
-        compress:
-          true
-      });
+    const marginMm=Number(savedTextDocument.margin)||15;
+    const marginPt=marginMm*72/25.4;
+    const contentWidth=Math.max(1,pageWidth-marginPt*2);
+    const background=savedTextDocument.background||"#ffffff";
 
+    const pdfDoc=await PDFDocument.create();
+    pdfDoc.registerFontkit(window.fontkit);
 
-    const marginMm =
-      Number(
-        savedTextDocument.margin
-      ) || 15;
+    const unicodeFonts=await window.loadPDFMakerUnicodeFonts();
 
-    const marginPt =
-      marginMm *
-      72 /
-      25.4;
+    const devanagariFont=await pdfDoc.embedFont(
+      unicodeFonts.devanagari,
+      {subset:true}
+    );
 
-    const contentWidth =
-      pageWidth -
-      marginPt * 2;
+    const bengaliFont=await pdfDoc.embedFont(
+      unicodeFonts.bengali,
+      {subset:true}
+    );
 
-    const background =
-      savedTextDocument.background ||
-      "#ffffff";
+    const helvetica=await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const helveticaBold=await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const helveticaOblique=await pdfDoc.embedFont(StandardFonts.HelveticaOblique);
+    const helveticaBoldOblique=await pdfDoc.embedFont(StandardFonts.HelveticaBoldOblique);
 
+    const times=await pdfDoc.embedFont(StandardFonts.TimesRoman);
+    const timesBold=await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
+    const timesItalic=await pdfDoc.embedFont(StandardFonts.TimesRomanItalic);
+    const timesBoldItalic=await pdfDoc.embedFont(StandardFonts.TimesRomanBoldItalic);
 
-    /* =====================================================
-       HELPERS
-    ===================================================== */
+    const courier=await pdfDoc.embedFont(StandardFonts.Courier);
+    const courierBold=await pdfDoc.embedFont(StandardFonts.CourierBold);
+    const courierOblique=await pdfDoc.embedFont(StandardFonts.CourierOblique);
+    const courierBoldOblique=await pdfDoc.embedFont(StandardFonts.CourierBoldOblique);
 
     function hexToRgb(hex){
+      if(!hex) return [255,255,255];
 
-      if(!hex){
-        return [255,255,255];
+      hex=String(hex).replace("#","").trim();
+
+      if(hex.length===3){
+        hex=hex.split("").map(function(c){
+          return c+c;
+        }).join("");
       }
 
-      hex =
-        String(hex)
-          .replace("#","")
-          .trim();
-
-      if(hex.length === 3){
-
-        hex =
-          hex
-            .split("")
-            .map(function(c){
-              return c + c;
-            })
-            .join("");
-      }
-
-      const n =
-        parseInt(hex,16);
+      const n=parseInt(hex,16);
 
       if(Number.isNaN(n)){
         return [255,255,255];
       }
 
       return [
-
-        (n >> 16) & 255,
-
-        (n >> 8) & 255,
-
-        n & 255
+        (n>>16)&255,
+        (n>>8)&255,
+        n&255
       ];
     }
 
-
-    function paintBackground(){
-
-      const rgb =
-        hexToRgb(background);
-
-      pdf.setFillColor(
-        rgb[0],
-        rgb[1],
-        rgb[2]
-      );
-
-      pdf.rect(
-        0,
-        0,
-        pageWidth,
-        pageHeight,
-        "F"
+    function rgbColor(hex){
+      const rgb=hexToRgb(hex);
+      return window.PDFLib.rgb(
+        rgb[0]/255,
+        rgb[1]/255,
+        rgb[2]/255
       );
     }
 
+    function scriptOfChar(ch){
+      const code=ch.codePointAt(0);
 
-    function normalizeFontFamily(font){
-
-      font =
-        String(font || "Arial")
-          .toLowerCase()
-          .trim();
-
-      if(font.includes("times")){
-        return "times";
+      if(
+        (code>=0x0900 && code<=0x097F)
+      ){
+        return "devanagari";
       }
 
       if(
-        font.includes("courier") ||
-        font.includes("mono")
+        (code>=0x0980 && code<=0x09FF)
       ){
-        return "courier";
+        return "bengali";
       }
 
-      if(
-        font.includes("georgia")
-      ){
-        return "times";
-      }
-
-      if(
-        font.includes("verdana") ||
-        font.includes("arial") ||
-        font.includes("helvetica")
-      ){
-        return "helvetica";
-      }
-
-      return "helvetica";
+      return "latin";
     }
 
-
-    function getFontStyle(run){
-
-      if(
-        run.bold &&
-        run.italic
-      ){
-        return "bolditalic";
-      }
-
-      if(run.bold){
-        return "bold";
-      }
-
-      if(run.italic){
-        return "italic";
-      }
-
-      return "normal";
-    }
-
-
-    function setRunFont(run){
-
-      pdf.setFont(
-        normalizeFontFamily(
-          run.fontFamily
-        ),
-        getFontStyle(run)
-      );
-
-      pdf.setFontSize(
-        Number(run.fontSize) || 20
-      );
-
-      const rgb =
-        hexToRgb(
-          run.color || "#111111"
-        );
-
-      pdf.setTextColor(
-        rgb[0],
-        rgb[1],
-        rgb[2]
-      );
-    }
-
-
-    function getLineHeight(runs){
-
-      let maxSize = 20;
-
-      runs.forEach(function(run){
-
-        const size =
-          Number(run.fontSize) || 20;
-
-        if(size > maxSize){
-          maxSize = size;
-        }
-      });
-
-      return maxSize * 1.25;
-    }
-
-
-    function splitRunText(run){
-
-      return String(
-        run.text || ""
-      ).split(
-        /(\s+)/
-      );
-    }
-
-
-    /* =====================================================
-       BUILD VISUAL LINES
-    ===================================================== */
-
-    function buildLines(runs){
-
-      const lines = [];
-
-      let current = [];
-
-      let currentWidth = 0;
-
-
-      function pushLine(){
-
-        lines.push(current);
-
-        current = [];
-
-        currentWidth = 0;
-      }
-
-
-      function addPiece(run,text){
-
-        if(!text){
-          return;
-        }
-
-        setRunFont(run);
-
-        const width =
-          pdf.getTextWidth(text);
-
-
-        if(width <= contentWidth){
-
-          if(
-            current.length &&
-            currentWidth + width >
-              contentWidth
-          ){
-
-            if(/^\s+$/.test(text)){
-              return;
-            }
-
-            pushLine();
-          }
-
-          current.push({
-
-            run:
-              Object.assign(
-                {},
-                run,
-                {text:text}
-              ),
-
-            width:
-              width
-          });
-
-          currentWidth += width;
-
-          return;
-        }
-
-
-        /* LONG WORD / LARGE TEXT */
-
-        let chunk = "";
-
-        for(const char of text){
-
-          const test =
-            chunk + char;
-
-          setRunFont(run);
-
-          const testWidth =
-            pdf.getTextWidth(test);
-
-
-          if(
-            chunk &&
-            currentWidth + testWidth >
-              contentWidth
-          ){
-
-            if(current.length){
-              pushLine();
-            }
-
-            chunk = "";
-          }
-
-          chunk += char;
-
-          setRunFont(run);
-
-          const chunkWidth =
-            pdf.getTextWidth(chunk);
-
-
-          if(
-            chunkWidth >
-            contentWidth
-          ){
-
-            if(chunk.length === 1){
-
-              current.push({
-
-                run:
-                  Object.assign(
-                    {},
-                    run,
-                    {text:chunk}
-                  ),
-
-                width:
-                  chunkWidth
-              });
-
-              currentWidth +=
-                chunkWidth;
-
-              pushLine();
-
-              chunk = "";
-            }
-          }
-        }
-
-
-        if(chunk){
-
-          setRunFont(run);
-
-          const chunkWidth =
-            pdf.getTextWidth(chunk);
-
-          current.push({
-
-            run:
-              Object.assign(
-                {},
-                run,
-                {text:chunk}
-              ),
-
-            width:
-              chunkWidth
-          });
-
-          currentWidth +=
-            chunkWidth;
-        }
-      }
-
-
-      runs.forEach(function(originalRun){
-
-        const text =
-          String(
-            originalRun.text || ""
-          );
-
-        const parts =
-          text.split("\n");
-
-
-        parts.forEach(function(part,index){
-
-          if(part){
-
-            const words =
-              part.split(
-                /(\s+)/
-              );
-
-            words.forEach(function(piece){
-
-              if(piece === ""){
-                return;
-              }
-
-              addPiece(
-                originalRun,
-                piece
-              );
+    function splitByScript(text){
+      const chars=Array.from(String(text||""));
+
+      if(!chars.length) return [];
+
+      const result=[];
+      let current="";
+      let currentScript=scriptOfChar(chars[0]);
+
+      chars.forEach(function(ch){
+        const script=scriptOfChar(ch);
+
+        if(script!==currentScript){
+          if(current){
+            result.push({
+              text:current,
+              script:currentScript
             });
           }
 
+          current=ch;
+          currentScript=script;
+        }else{
+          current+=ch;
+        }
+      });
+
+      if(current){
+        result.push({
+          text:current,
+          script:currentScript
+        });
+      }
+
+      return result;
+    }
+
+    function latinFont(run){
+      const family=String(
+        run.fontFamily||"Arial"
+      ).toLowerCase();
+
+      const bold=!!run.bold;
+      const italic=!!run.italic;
+
+      if(
+        family.includes("times") ||
+        family.includes("georgia")
+      ){
+        if(bold && italic) return timesBoldItalic;
+        if(bold) return timesBold;
+        if(italic) return timesItalic;
+        return times;
+      }
+
+      if(
+        family.includes("courier") ||
+        family.includes("mono")
+      ){
+        if(bold && italic) return courierBoldOblique;
+        if(bold) return courierBold;
+        if(italic) return courierOblique;
+        return courier;
+      }
+
+      if(bold && italic) return helveticaBoldOblique;
+      if(bold) return helveticaBold;
+      if(italic) return helveticaOblique;
+      return helvetica;
+    }
+
+    function fontForSegment(run,script){
+      if(script==="devanagari"){
+        return devanagariFont;
+      }
+
+      if(script==="bengali"){
+        return bengaliFont;
+      }
+
+      return latinFont(run);
+    }
+
+    function makeSegments(run){
+      const segments=splitByScript(run.text||"");
+
+      return segments.map(function(segment){
+        return {
+          run:run,
+          text:segment.text,
+          script:segment.script,
+          font:fontForSegment(run,segment.script)
+        };
+      });
+    }
+
+    function segmentWidth(segment){
+      const size=Number(segment.run.fontSize)||20;
+
+      return segment.font.widthOfTextAtSize(
+        segment.text,
+        size
+      );
+    }
+
+    function getLineHeight(runs){
+      let maxSize=20;
+
+      (runs||[]).forEach(function(run){
+        const size=Number(run.fontSize)||20;
+
+        if(size>maxSize){
+          maxSize=size;
+        }
+      });
+
+      return maxSize*1.25;
+    }
+
+    function splitTextKeepingWhitespace(text){
+      return String(text||"").split(/(\s+)/);
+    }
+
+    function buildLines(runs){
+      const lines=[];
+      let current=[];
+      let currentWidth=0;
+
+      function pushLine(){
+        lines.push(current);
+        current=[];
+        currentWidth=0;
+      }
+
+      function addText(run,text){
+        if(!text) return;
+
+        const segments=makeSegments(
+          Object.assign({},run,{text:text})
+        );
+
+        segments.forEach(function(segment){
+          const width=segmentWidth(segment);
 
           if(
-            index <
-            parts.length - 1
+            width<=contentWidth &&
+            current.length &&
+            currentWidth+width>contentWidth &&
+            !/^\s+$/.test(segment.text)
           ){
+            pushLine();
+          }
 
+          if(width<=contentWidth){
+            current.push({
+              segment:segment,
+              width:width
+            });
+
+            currentWidth+=width;
+            return;
+          }
+
+          const chars=Array.from(segment.text);
+
+          chars.forEach(function(ch){
+            const charSegment={
+              run:segment.run,
+              text:ch,
+              script:segment.script,
+              font:segment.font
+            };
+
+            const charWidth=segmentWidth(charSegment);
+
+            if(
+              current.length &&
+              currentWidth+charWidth>contentWidth
+            ){
+              pushLine();
+            }
+
+            current.push({
+              segment:charSegment,
+              width:charWidth
+            });
+
+            currentWidth+=charWidth;
+          });
+        });
+      }
+
+      (runs||[]).forEach(function(run){
+        const parts=String(run.text||"").split("\n");
+
+        parts.forEach(function(part,index){
+          const words=splitTextKeepingWhitespace(part);
+
+          words.forEach(function(word){
+            addText(run,word);
+          });
+
+          if(index<parts.length-1){
             pushLine();
           }
         });
       });
 
-
-      if(
-        current.length ||
-        !lines.length
-      ){
-
+      if(current.length || !lines.length){
         pushLine();
       }
 
       return lines;
     }
 
-
-    /* =====================================================
-       DRAW LINE
-    ===================================================== */
-
-    function drawLine(
-      line,
-      alignment,
-      baseline,
-      extraLeft = 0
-    ){
-
-      let totalWidth = 0;
+    function drawLine(page,line,alignment,baselineTop,extraLeft){
+      let totalWidth=0;
 
       line.forEach(function(item){
-
-        totalWidth +=
-          item.width;
+        totalWidth+=item.width;
       });
 
+      let x=marginPt+(Number(extraLeft)||0);
 
-      let x =
-        marginPt +
-        extraLeft;
-
-
-      const availableWidth =
-        contentWidth -
-        extraLeft;
-
-
-      if(alignment === "center"){
-
-        x =
-          marginPt +
-          extraLeft +
-          (
-            availableWidth -
-            totalWidth
-          ) / 2;
-
-      }else if(alignment === "right"){
-
-        x =
-          marginPt +
-          extraLeft +
-          availableWidth -
-          totalWidth;
+      if(alignment==="center"){
+        x=marginPt+(contentWidth-totalWidth)/2;
+      }else if(alignment==="right"){
+        x=marginPt+contentWidth-totalWidth;
       }
 
-
       line.forEach(function(item){
+        const segment=item.segment;
+        const run=segment.run;
+        const size=Number(run.fontSize)||20;
+        const width=item.width;
 
-        const run =
-          item.run;
-
-        const text =
-          run.text;
-
-        if(!text){
-          return;
-        }
-
-        setRunFont(run);
-
-        const width =
-          item.width;
-
-
-        /* HIGHLIGHT */
+        const y=pageHeight-baselineTop;
 
         if(run.highlight){
+          const rgb=hexToRgb(run.highlight);
 
-          const rgb =
-            hexToRgb(
-              run.highlight
-            );
-
-          pdf.setFillColor(
-            rgb[0],
-            rgb[1],
-            rgb[2]
-          );
-
-          const size =
-            Number(run.fontSize) || 20;
-
-          pdf.rect(
-
-            x - 1,
-
-            baseline -
-              size * 0.9,
-
-            width + 2,
-
-            size * 1.15,
-
-            "F"
-          );
-
-          setRunFont(run);
+          page.drawRectangle({
+            x:x-1,
+            y:y-size*0.9,
+            width:width+2,
+            height:size*1.15,
+            color:window.PDFLib.rgb(
+              rgb[0]/255,
+              rgb[1]/255,
+              rgb[2]/255
+            )
+          });
         }
 
-
-        pdf.text(
-          text,
-          x,
-          baseline
-        );
-
-
-        /* UNDERLINE */
+        page.drawText(segment.text,{
+          x:x,
+          y:y,
+          size:size,
+          font:segment.font,
+          color:rgbColor(run.color||"#111111")
+        });
 
         if(run.underline){
-
-          const rgb =
-            hexToRgb(
-              run.color ||
-              "#111111"
-            );
-
-          pdf.setDrawColor(
-            rgb[0],
-            rgb[1],
-            rgb[2]
-          );
-
-          pdf.setLineWidth(
-            0.7
-          );
-
-          pdf.line(
-
-            x,
-
-            baseline + 1.5,
-
-            x + width,
-
-            baseline + 1.5
-          );
+          page.drawLine({
+            start:{
+              x:x,
+              y:y-1.5
+            },
+            end:{
+              x:x+width,
+              y:y-1.5
+            },
+            thickness:Math.max(0.6,size/18),
+            color:rgbColor(run.color||"#111111")
+          });
         }
 
-
-        x += width;
+        x+=width;
       });
     }
 
+    let page=pdfDoc.addPage([
+      pageWidth,
+      pageHeight
+    ]);
 
-    /* =====================================================
-       DRAW BLOCK
-    ===================================================== */
-
-    let cursorY =
-      marginPt;
-
-
-    function ensureSpace(height){
-
-      if(
-        cursorY + height >
-        pageHeight - marginPt
-      ){
-
-        pdf.addPage(
-
-          [
-            pageWidth,
-            pageHeight
-          ],
-
-          pageWidth > pageHeight
-            ? "landscape"
-            : "portrait"
-        );
-
-        paintBackground();
-
-        cursorY =
-          marginPt;
-      }
-    }
-
-
-    function drawTextBlock(
-      block,
-      options = {}
-    ){
-
-      const runs =
-        block.runs || [];
-
-      if(!runs.length){
-
-        cursorY +=
-          16 * 1.25;
-
-        return;
-      }
-
-
-      const lines =
-        buildLines(runs);
-
-
-      let lineHeight =
-        getLineHeight(runs);
-
-
-      if(options.lineHeight){
-        lineHeight =
-          Math.max(
-            lineHeight,
-            options.lineHeight
-          );
-      }
-
-
-      const extraLeft =
-        Number(
-          options.extraLeft
-        ) || 0;
-
-
-      lines.forEach(function(line){
-
-        ensureSpace(
-          lineHeight
-        );
-
-        drawLine(
-
-          line,
-
-          block.alignment || "left",
-
-          cursorY +
-            lineHeight,
-
-          extraLeft
-        );
-
-        cursorY +=
-          lineHeight;
+    function paintBackground(){
+      page.drawRectangle({
+        x:0,
+        y:0,
+        width:pageWidth,
+        height:pageHeight,
+        color:rgbColor(background)
       });
-
-
-      cursorY +=
-        Number(
-          options.after
-        ) || 4;
     }
-
-
-    /* =====================================================
-       START PAGE
-    ===================================================== */
 
     paintBackground();
 
+    let cursorY=marginPt;
 
-    /* =====================================================
-       OPTIONAL DOCUMENT HEADING
-    ===================================================== */
+    function ensureSpace(height){
+      if(
+        cursorY+height >
+        pageHeight-marginPt
+      ){
+        page=pdfDoc.addPage([
+          pageWidth,
+          pageHeight
+        ]);
 
-    const documentHeading =
-      savedTextDocument.heading || {};
+        paintBackground();
+
+        cursorY=marginPt;
+      }
+    }
+
+    function drawTextBlock(block,options){
+      options=options||{};
+
+      const runs=block.runs||[];
+
+      if(!runs.length){
+        cursorY+=16*1.25;
+        return;
+      }
+
+      const lines=buildLines(runs);
+      const lineHeight=
+        Number(options.lineHeight) ||
+        getLineHeight(runs);
+
+      const extraLeft=
+        Number(options.extraLeft)||0;
+
+      lines.forEach(function(line){
+        ensureSpace(lineHeight);
+
+        drawLine(
+          page,
+          line,
+          block.alignment||"left",
+          cursorY+lineHeight*0.8,
+          extraLeft
+        );
+
+        cursorY+=lineHeight;
+      });
+
+      cursorY+=Number(options.after)||4;
+    }
+
+    const documentHeading=savedTextDocument.heading||{};
 
     if(
       documentHeading.text &&
       String(documentHeading.text).trim()
     ){
-
-      const headingRun = {
-        text:
-          String(documentHeading.text),
-
-        fontFamily:
-          documentHeading.font || "Arial",
-
-        fontSize:
-          28,
-
-        bold:
-          true,
-
-        italic:
-          false,
-
-        underline:
-          false,
-
-        color:
-          "#111111",
-
-        highlight:
-          null
-      };
-
-      const headingBlock = {
-        alignment:
-          "center",
-
-        runs:
-          [headingRun]
+      const headingRun={
+        text:String(documentHeading.text),
+        fontFamily:documentHeading.font||"Arial",
+        fontSize:28,
+        bold:true,
+        italic:false,
+        underline:false,
+        color:"#111111",
+        highlight:null
       };
 
       drawTextBlock(
-        headingBlock,
         {
-          after:
-            12
+          alignment:"center",
+          runs:[headingRun]
+        },
+        {
+          after:12
         }
       );
     }
 
-    const body =
-      savedTextDocument.body || [];
-
+    const body=savedTextDocument.body||[];
 
     body.forEach(function(block){
-
-      if(block.type === "page-break"){
-
-        pdf.addPage(
-
-          [
-            pageWidth,
-            pageHeight
-          ],
-
-          pageWidth > pageHeight
-            ? "landscape"
-            : "portrait"
-        );
+      if(block.type==="page-break"){
+        page=pdfDoc.addPage([
+          pageWidth,
+          pageHeight
+        ]);
 
         paintBackground();
-
-        cursorY =
-          marginPt;
-
+        cursorY=marginPt;
         return;
       }
 
-
-      if(block.type === "blank"){
-
-        ensureSpace(
-          16 * 1.25
-        );
-
-        cursorY +=
-          16 * 1.25;
-
+      if(block.type==="blank"){
+        ensureSpace(16*1.25);
+        cursorY+=16*1.25;
         return;
       }
 
+      if(block.type==="heading"){
+        const level=Number(block.level)||1;
 
-      /* ===================================================
-         HEADING
-      =================================================== */
-
-      if(block.type === "heading"){
-
-        const level =
-          Number(block.level) || 1;
-
-        const headingSizes = {
-
-          1: 28,
-          2: 22,
-          3: 18
+        const headingSizes={
+          1:28,
+          2:22,
+          3:18
         };
 
-        const headingSize =
-          headingSizes[level] || 18;
+        const headingSize=
+          headingSizes[level]||18;
 
-
-        const runs =
-          (block.runs || [])
-            .map(function(run){
-
-              return Object.assign(
-                {},
-                run,
-                {
-                  fontSize:
-                    Number(run.fontSize) === 16
-                      ? headingSize
-                      : run.fontSize
-                }
-              );
-            });
-
+        const runs=(block.runs||[]).map(function(run){
+          return Object.assign({},run,{
+            fontSize:
+              Number(run.fontSize)===16
+                ? headingSize
+                : run.fontSize
+          });
+        });
 
         drawTextBlock(
-
           {
-            alignment:
-              block.alignment || "left",
-
-            runs:
-              runs
+            alignment:block.alignment||"left",
+            runs:runs
           },
-
           {
-            after:
-              level === 1
-                ? 10
-                : 7
+            after:level===1?10:7
           }
         );
 
         return;
       }
 
+      if(block.type==="list-item"){
+        let prefix="•";
 
-      /* ===================================================
-         LIST ITEM
-      =================================================== */
+        if(block.listType==="number"){
+          prefix=String(block.index||1)+".";
+        }else if(block.listType==="check"){
+          prefix="[ ]";
+        }
 
-      if(block.type === "list-item"){
-
-        const listPrefix =
-          block.listType === "number"
-            ? String(block.index || 1) + "."
-            : block.listType === "check"
-              ? "☐"
-              : "•";
-
-
-        const prefixRun = {
-
-          text:
-            listPrefix + " ",
-
-          fontFamily:
-            "Arial",
-
-          fontSize:
-            16,
-
-          bold:
-            false,
-
-          italic:
-            false,
-
-          underline:
-            false,
-
-          color:
-            "#111111",
-
-          highlight:
-            null
+        const prefixRun={
+          text:prefix+" ",
+          fontFamily:"Arial",
+          fontSize:16,
+          bold:false,
+          italic:false,
+          underline:false,
+          color:"#111111",
+          highlight:null
         };
 
-
-        const listRuns =
-          [
-            prefixRun
-          ].concat(
-            block.runs || []
-          );
-
+        const listRuns=[prefixRun].concat(
+          block.runs||[]
+        );
 
         drawTextBlock(
-
           {
-            alignment:
-              "left",
-
-            runs:
-              listRuns
+            alignment:"left",
+            runs:listRuns
           },
-
           {
-            extraLeft:
-              4,
-
-            after:
-              3
+            extraLeft:4,
+            after:3
           }
         );
 
         return;
       }
 
-
-      /* ===================================================
-         QUOTE
-      =================================================== */
-
-      if(block.type === "quote"){
-
-        const quoteRuns =
-          (block.runs || [])
-            .map(function(run){
-
-              return Object.assign(
-                {},
-                run,
-                {
-                  italic:
-                    true
-                }
-              );
-            });
-
+      if(block.type==="quote"){
+        const quoteRuns=(block.runs||[]).map(function(run){
+          return Object.assign({},run,{
+            italic:true
+          });
+        });
 
         drawTextBlock(
-
           {
-            alignment:
-              block.alignment || "left",
-
-            runs:
-              quoteRuns
+            alignment:block.alignment||"left",
+            runs:quoteRuns
           },
-
           {
-            extraLeft:
-              18,
-
-            after:
-              8
+            extraLeft:18,
+            after:8
           }
         );
 
         return;
       }
 
-
-      /* ===================================================
-         NORMAL PARAGRAPH
-      =================================================== */
-
-      if(block.type === "paragraph"){
-
+      if(block.type==="paragraph"){
         drawTextBlock(
-
           block,
-
           {
-            after:
-              4
+            after:4
           }
         );
-
       }
-
     });
 
+    const pdfBytes=await pdfDoc.save();
 
-    /* =====================================================
-       CREATE BLOB
-       DO NOT AUTO-DOWNLOAD
-    ===================================================== */
-
-    generatedTextPDFBlob =
-      pdf.output("blob");
-
+    generatedTextPDFBlob=new Blob(
+      [pdfBytes],
+      {type:"application/pdf"}
+    );
 
     if(generatedTextPDFUrl){
-
-      URL.revokeObjectURL(
-        generatedTextPDFUrl
-      );
+      URL.revokeObjectURL(generatedTextPDFUrl);
     }
 
-
-    generatedTextPDFUrl =
+    generatedTextPDFUrl=
       URL.createObjectURL(
         generatedTextPDFBlob
       );
 
-
-    const downloadBtn =
-      document.getElementById(
-        "downloadTextPDF"
-      );
-
+    const downloadBtn=
+      document.getElementById("downloadTextPDF");
 
     if(downloadBtn){
-
-      downloadBtn.style.display =
-        "inline-flex";
+      downloadBtn.style.display="inline-flex";
     }
 
+    const heading=
+      (
+        savedTextDocument &&
+        savedTextDocument.heading &&
+        savedTextDocument.heading.text
+      )
+        ? savedTextDocument.heading.text
+        : "text-document";
 
-    const heading =
-      (savedTextDocument && savedTextDocument.heading && savedTextDocument.heading.text)
-      ? savedTextDocument.heading.text
-      : "text-document";
-
-    const filename =
-      heading.replace(/[^a-zA-Z0-9 _-]/g,"").trim() ||
+    const filename=
+      heading
+        .replace(/[^a-zA-Z0-9 _-]/g,"")
+        .trim() ||
       "text-document";
 
-    const link = document.createElement("a");
-    link.href = generatedTextPDFUrl;
-    link.download = filename + ".pdf";
+    const link=document.createElement("a");
+
+    link.href=generatedTextPDFUrl;
+    link.download=filename+".pdf";
+
     document.body.appendChild(link);
     link.click();
     link.remove();
 
-    status.style.display =
-      "block";
-
-    status.textContent =
+    status.style.display="block";
+    status.textContent=
       "PDF generated and downloaded successfully. ✅";
 
   }catch(error){
-
     console.error(
-      "Text PDF generation error:",
+      "Unicode Text PDF generation error:",
       error
     );
 
-    status.style.display =
-      "block";
-
-    status.textContent =
-      "Could not generate PDF: " +
-      error.message;
+    status.style.display="block";
+    status.textContent=
+      "Could not generate PDF: "+error.message;
   }
 }
 
-/* =========================================================
-   DOCUMENT → PDF
+/* DOCUMENT → PDF
 ========================================================= */
 
 const documentInput=
@@ -7265,16 +7520,7 @@ function updateImagePDFProgress(step, percent, text){
     return;
   }
 
-  const button =
-    document.getElementById("createImagesPDF");
-
-  if(
-    button &&
-    button.parentElement &&
-    modal.parentElement !== button.parentElement
-  ){
-    button.parentElement.appendChild(modal);
-  }
+  
 
   modal.style.display = "flex";
 
@@ -7321,34 +7567,16 @@ function showImagePDFProgress(){
   const modal =
     document.getElementById("imagePDFProgress");
 
-  const button =
-    document.getElementById("createImagesPDF");
-
-  if(
-    modal &&
-    button &&
-    button.parentElement
-  ){
-    button.parentElement.appendChild(modal);
-  }
-
   imagePDFAnimatedPercent = 0;
   imagePDFCancelled = false;
 
   if(modal){
+    if(modal.parentElement !== document.body){
+      document.body.appendChild(modal);
+    }
     modal.style.display = "flex";
 
-    const box =
-      modal.querySelector(".image-pdf-progress-box");
-
-    if(box){
-      box.style.position = "fixed";
-      box.style.left = "50%";
-      box.style.bottom = "24px";
-      box.style.top = "auto";
-      box.style.transform = "translateX(-50%)";
-    }
-  }
+      }
 
   const errorBox =
     document.getElementById("imagePDFProgressError");

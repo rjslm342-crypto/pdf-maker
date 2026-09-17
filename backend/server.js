@@ -97,7 +97,7 @@ const upload = multer({
 
             cb(
                 new Error(
-                    "Only JPG and PNG images are allowed."
+                    "Only JPG, JPEG and PNG images are allowed."
                 )
             );
 
@@ -299,6 +299,17 @@ app.post(
                     )
                 );
 
+            let processedFlags = [];
+
+            try {
+                if (req.body && req.body.processedFlags) {
+                    processedFlags = JSON.parse(req.body.processedFlags);
+                }
+            } catch (error) {
+                console.warn("Could not parse processedFlags:", error.message);
+                processedFlags = [];
+            }
+
             for (
                 let imageIndex = 0;
                 imageIndex < req.files.length;
@@ -342,15 +353,52 @@ app.post(
                     // JPEG FAST PATH
                     // -----------------------------
 
-                    if (file.mimetype === "image/jpeg") {
-                console.log("JPEG normalization: decoding and re-encoding JPEG");
-                image = await Image.decode(new Uint8Array(imageBytes), { tolerantDecoding:true, runtimeDecoding:"prefer" });
-                if (!image || !image.width || !image.height) {
-                    throw new Error("JPEG decoder returned invalid dimensions");
-                }
-                jpegBytes = await image.encode("jpeg", { quality:82, progressive:false });
-                console.log("JPEG normalized:", jpegBytes.length, "bytes");
-            } else {
+                    const browserProcessed =
+                        processedFlags[imageIndex] === "1";
+
+                    if (browserProcessed) {
+
+                        console.log(
+                            "Frontend JPEG ready: direct embed, skipping cross-image"
+                        );
+
+                        jpegBytes = imageBytes;
+
+                    } else if (file.mimetype === "image/jpeg") {
+
+                        console.log(
+                            "JPEG fallback: decoding and re-encoding JPEG"
+                        );
+
+                        image = await Image.decode(
+                            new Uint8Array(imageBytes),
+                            {
+                                tolerantDecoding:true,
+                                runtimeDecoding:"prefer"
+                            }
+                        );
+
+                        if (!image || !image.width || !image.height) {
+                            throw new Error(
+                                "JPEG decoder returned invalid dimensions"
+                            );
+                        }
+
+                        jpegBytes = await image.encode(
+                            "jpeg",
+                            {
+                                quality:82,
+                                progressive:false
+                            }
+                        );
+
+                        console.log(
+                            "JPEG normalized:",
+                            jpegBytes.length,
+                            "bytes"
+                        );
+
+                    } else {
 
                         // -----------------------------
                         // Universal decode
@@ -907,6 +955,148 @@ app.get("/api/admin/visitors", function (req, res) {
         ).length,
         visitors: list
     });
+});
+
+// =====================================
+// HERO IMAGE MANAGEMENT
+// =====================================
+const HERO_REPO = "rjslm342-crypto/pdf-maker";
+const HERO_PATH = "frontend/hero-background.png";
+let heroImageCache = null;
+let heroImageContentType = "image/png";
+
+function adminKeyIsValid(req) {
+  const key = (req.headers["x-admin-key"] || req.query.key || "").trim();
+  return !!key && key === (process.env.ADMIN_KEY || "").trim();
+}
+
+async function githubRequest(url, options = {}) {
+  const token = (process.env.GITHUB_TOKEN || "").trim();
+  if (!token) throw new Error("GitHub token is not configured.");
+
+  const response = await fetch(url, {
+    ...options,
+    headers: {
+      "Authorization": "Bearer " + token,
+      "Accept": "application/vnd.github+json",
+      "X-GitHub-Api-Version": "2022-11-28",
+      ...(options.headers || {})
+    }
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    throw new Error("GitHub API " + response.status + ": " + text.slice(0, 300));
+  }
+
+  return response;
+}
+
+app.get("/api/hero-image", async function (req, res) {
+  try {
+    if (!heroImageCache) {
+      const response = await githubRequest(
+        "https://api.github.com/repos/" + HERO_REPO +
+        "/contents/" + HERO_PATH + "?ref=master"
+      );
+
+      const data = await response.json();
+      heroImageCache = Buffer.from(data.content.replace(/\s/g, ""), "base64");
+      heroImageContentType =
+        data.name && /\.jpe?g$/i.test(data.name) ? "image/jpeg" : "image/png";
+    }
+
+    res.set("Cache-Control", "public, max-age=300");
+    res.type(heroImageContentType).send(heroImageCache);
+  } catch (error) {
+    console.error("Hero image fetch error:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Hero image unavailable."
+    });
+  }
+});
+
+app.post("/api/admin/hero-image", upload.single("heroImage"), async function (req, res) {
+  if (!adminKeyIsValid(req)) {
+    return res.status(403).json({
+      success: false,
+      message: "Access denied"
+    });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      success: false,
+      message: "Please select a JPG, JPEG or PNG image."
+    });
+  }
+
+  try {
+    const uploadedBuffer = fs.readFileSync(req.file.path);
+
+    // Normalize JPG/JPEG/PNG to PNG so the existing
+    // frontend hero-background.png path always remains valid.
+    const { Image } = await import("cross-image");
+    const image = await Image.decode(uploadedBuffer);
+
+    if (!image || !image.width || !image.height) {
+      throw new Error("Invalid hero image dimensions.");
+    }
+
+    const fileBuffer = await image.encode("png", {
+      compressionLevel: 6
+    });
+
+    const getResponse = await githubRequest(
+      "https://api.github.com/repos/" + HERO_REPO +
+      "/contents/" + HERO_PATH + "?ref=master"
+    );
+
+    const currentFile = await getResponse.json();
+
+    const putResponse = await githubRequest(
+      "https://api.github.com/repos/" + HERO_REPO +
+      "/contents/" + HERO_PATH,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          message: "Update hero background image",
+          content: Buffer.from(fileBuffer).toString("base64"),
+          sha: currentFile.sha,
+          branch: "master"
+        })
+      }
+    );
+
+    await putResponse.json();
+
+    heroImageCache = fileBuffer;
+    heroImageContentType = "image/png";
+
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (e) {}
+
+    res.json({
+      success: true,
+      message: "Hero image updated successfully. Frontend will redeploy automatically."
+    });
+  } catch (error) {
+    try {
+      fs.unlinkSync(req.file.path);
+    } catch (e) {}
+
+    console.error("Hero image update error:", error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "Could not update hero image."
+    });
+  }
 });
 
 app.get("/terms-policy", function (req, res) { res.sendFile(require("path").join(__dirname, "terms-policy.html")); });

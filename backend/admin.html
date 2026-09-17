@@ -241,7 +241,27 @@ th{
       <div id="selectedDateText" class="status"></div>
     </div>
 
-    <div class="stats">
+    
+<div id="heroImageSection" class="card" style="margin-top:20px;">
+  <h2 style="margin-top:0;">Hero Image</h2>
+  <div class="subtitle">Change the image used in the main website Hero Section.</div>
+
+  <div style="margin:15px 0;">
+    <img id="heroPreview"
+         src="/api/hero-image?preview=1"
+         alt="Current Hero Image"
+         style="display:block;width:100%;max-width:700px;max-height:300px;object-fit:cover;border-radius:12px;border:1px solid rgba(255,255,255,.15);">
+  </div>
+
+  <div class="auth-row">
+    <input id="heroImageInput" type="file" accept="image/png,image/jpeg">
+    <button id="heroUploadBtn" type="button">Upload New Hero Image</button>
+  </div>
+
+  <div id="heroStatus" class="status"></div>
+</div>
+
+<div class="stats">
       <div class="stat">
         <div class="stat-title">Total Visits</div>
         <div id="totalVisits" class="stat-value">0</div>
@@ -466,6 +486,64 @@ setInterval(function(){
     loadVisitors();
   }
 },30000);
+
+const heroImageInput = document.getElementById("heroImageInput");
+const heroUploadBtn = document.getElementById("heroUploadBtn");
+const heroPreview = document.getElementById("heroPreview");
+const heroStatus = document.getElementById("heroStatus");
+
+heroUploadBtn.addEventListener("click", async function(){
+  if(!adminKey){
+    heroStatus.textContent = "Please login first.";
+    return;
+  }
+
+  if(!heroImageInput.files || !heroImageInput.files[0]){
+    heroStatus.textContent = "Please select a JPG, JPEG or PNG image.";
+    return;
+  }
+
+  const file = heroImageInput.files[0];
+
+  if(!["image/png","image/jpeg"].includes(file.type)){
+    heroStatus.textContent = "Only JPG, JPEG and PNG images are allowed.";
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append("heroImage", file);
+
+  heroUploadBtn.disabled = true;
+  heroUploadBtn.textContent = "Uploading...";
+  heroStatus.textContent = "Uploading hero image...";
+
+  try {
+    const response = await fetch("/api/admin/hero-image", {
+      method: "POST",
+      headers: {
+        "x-admin-key": adminKey
+      },
+      body: formData
+    });
+
+    const data = await response.json();
+
+    if(!response.ok || !data.success){
+      throw new Error(data.message || "Upload failed.");
+    }
+
+    heroStatus.textContent = data.message || "Hero image updated successfully.";
+
+    heroPreview.src = "/api/hero-image?preview=" + Date.now();
+    heroImageInput.value = "";
+  } catch(error) {
+    heroStatus.textContent = error.message || "Unable to update hero image.";
+  } finally {
+    heroUploadBtn.disabled = false;
+    heroUploadBtn.textContent = "Upload New Hero Image";
+  }
+});
+
 </script>
 
 </body>

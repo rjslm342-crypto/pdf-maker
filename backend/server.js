@@ -995,28 +995,18 @@ async function githubRequest(url, options = {}) {
 app.get("/api/hero-image", async function (req, res) {
   try {
     if (!heroImageCache) {
-      const response = await githubRequest(
-        "https://api.github.com/repos/" + HERO_REPO +
-        "/contents/" + HERO_PATH + "?ref=master"
-      );
-
-      const data = await response.json();
-      heroImageCache = Buffer.from(data.content.replace(/\s/g, ""), "base64");
-      heroImageContentType =
-        data.name && /\.jpe?g$/i.test(data.name) ? "image/jpeg" : "image/png";
+      const response = await fetch("https://raw.githubusercontent.com/" + HERO_REPO + "/master/" + HERO_PATH);
+      if (!response.ok) throw new Error("GitHub raw image HTTP " + response.status);
+      heroImageCache = Buffer.from(await response.arrayBuffer());
+      heroImageContentType = "image/png";
     }
-
     res.set("Cache-Control", "public, max-age=300");
     res.type(heroImageContentType).send(heroImageCache);
   } catch (error) {
     console.error("Hero image fetch error:", error.message);
-    res.status(500).json({
-      success: false,
-      message: "Hero image unavailable."
-    });
+    res.status(500).json({success:false,message:"Hero image unavailable."});
   }
 });
-
 app.post("/api/admin/hero-image", upload.single("heroImage"), async function (req, res) {
   if (!adminKeyIsValid(req)) {
     return res.status(403).json({

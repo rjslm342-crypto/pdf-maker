@@ -278,7 +278,7 @@ th{
         <table>
           <thead>
             <tr>
-              <th>Device</th>
+              <th>IP Address</th><th>Device</th>
               <th>OS</th>
               <th>Browser</th>
               <th>Date</th>
@@ -289,7 +289,7 @@ th{
 
           <tbody id="visitorTable">
             <tr>
-              <td colspan="6" class="empty">No visitor data</td>
+              <td colspan="7" class="empty">No visitor data</td>
             </tr>
           </tbody>
         </table>
@@ -369,7 +369,7 @@ function renderVisitors(){
 
   if(filtered.length === 0){
     visitorTable.innerHTML =
-      '<tr><td colspan="6" class="empty">No visitors found for this date.</td></tr>';
+      '<tr><td colspan="7" class="empty">No visitors found for this date.</td></tr>';
     updateDateText();
     return;
   }
@@ -379,7 +379,7 @@ function renderVisitors(){
     const row = document.createElement("tr");
 
     row.innerHTML =
-      "<td>" + (v.device || "Unknown") + "</td>" +
+      "<td>" + (v.ip || "Unknown") + "</td>" + "<td>" + (v.device || "Unknown") + "</td>" +
       "<td>" + (v.os || "Unknown") + "</td>" +
       "<td>" + (v.browser || "Unknown") + "</td>" +
       "<td>" + formatDate(v.lastSeen) + "</td>" +
